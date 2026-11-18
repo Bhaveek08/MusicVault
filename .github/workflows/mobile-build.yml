@@ -50,6 +50,10 @@ jobs:
           curl -fsSL https://services.gradle.org/distributions/gradle-8.9-bin.zip -o "$RUNNER_TEMP/gradle.zip"
           unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
           echo "$RUNNER_TEMP/gradle-8.9/bin" >> "$GITHUB_PATH"
+      - name: Set up Python for screenshot verification
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Build debug APK
         working-directory: mobile/android
         run: gradle --no-daemon --stacktrace assembleDebug
@@ -87,8 +91,8 @@ jobs:
             mkdir -p artifacts
             adb exec-out screencap -p > artifacts/android-emulator.png
             adb logcat -d -s chromium:V WebView:V System.err:V > artifacts/android-webview.log
-            python3 -m pip install --quiet pillow
-            python3 - <<'PY'
+            python -m pip install --quiet pillow
+            python - <<'PY'
             from PIL import Image
 
             image = Image.open("artifacts/android-emulator.png").convert("RGB")

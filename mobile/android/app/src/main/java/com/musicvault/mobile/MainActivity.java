@@ -13,8 +13,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import android.webkit.WebResourceResponse;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -63,7 +66,15 @@ public final class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return assetLoader.shouldInterceptRequest(request.getUrl());
+                Uri uri = request.getUrl();
+                if ("https".equalsIgnoreCase(uri.getScheme())
+                    && "appassets.androidplatform.net".equalsIgnoreCase(uri.getHost())
+                    && uri.getPath() != null && uri.getPath().startsWith("/assets/")) {
+                    WebResourceResponse asset = assetLoader.shouldInterceptRequest(uri);
+                    if (asset != null) return asset;
+                }
+                return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked",
+                    Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
             }
 
             @Override

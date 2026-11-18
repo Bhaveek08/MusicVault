@@ -44,7 +44,7 @@ On macOS with Xcode installed, open `ios/MusicVault.xcodeproj`, select the `Musi
 
 ## Security boundaries
 
-The WebViews load bundled local content. External navigation is restricted to official Spotify HTTPS domains; the mobile shell does not load remote YouTube pages or execute the desktop downloader. Android disables file URL access, mixed content, cleartext traffic, backup, and arbitrary external navigation. Neither client requests storage or network permissions because downloads are not implemented.
+The WebViews load bundled local content. External navigation is restricted to official Spotify HTTPS domains; the mobile shell does not load remote YouTube pages or execute the desktop downloader. Android's INTERNET permission supports its local HTTPS WebView asset origin; the WebView blocks other network resources, file URL access, mixed content, cleartext traffic, backup, and arbitrary external navigation. Neither client requests storage permissions because downloads are not implemented.
 
 ## Release requirements still open
 

@@ -1,6 +1,6 @@
 # Android app
 
-This folder contains the native Android WebView shell. It loads the shared offline UI from mobile/shared/ through AndroidX WebViewAssetLoader on the appassets HTTPS origin. External navigation is restricted to official Spotify HTTPS links; all other external URLs are blocked.
+This folder contains the native Android WebView shell. It loads the shared offline UI from mobile/shared/ through AndroidX WebViewAssetLoader on the appassets HTTPS origin. The app has the normal INTERNET permission so WebView can use this HTTPS asset origin, but its WebView blocks all non-appassets network resources and only hands official Spotify HTTPS links to the Spotify app or Android link handler.
 
 ## Build a debug APK
 
@@ -21,7 +21,7 @@ The [Mobile native builds workflow](https://github.com/Bhaveek08/MusicVault/acti
 
 ## Current scope
 
-This is an installable UI test build. YouTube links can be validated and queued as previews. Media downloading is not connected to Android yet. Spotify links are handed off to the Spotify app or Android's link handler. The app does not request internet, storage, or media permissions.
+This is an installable UI test build. YouTube links can be validated and queued as previews. Media downloading is not connected to Android yet. Spotify links are handed off to the Spotify app or Android's link handler. The app requests INTERNET for the local HTTPS WebView asset origin, but does not request storage or media permissions.
 
 ## Security
 
