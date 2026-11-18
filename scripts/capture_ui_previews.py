@@ -42,6 +42,8 @@ def render(widget, output: Path, size: QSize, *, desktop_tab: int | None = None,
 
 
 def main() -> int:
+    if sys.platform.startswith("linux") and not os.environ.get("DISPLAY"):
+        raise RuntimeError("On Linux, run screenshot capture inside Xvfb (xvfb-run -a).")
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("artifacts/ui-preview"))
     args = parser.parse_args()
