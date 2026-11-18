@@ -30,8 +30,21 @@ jobs:
         uses: android-actions/setup-android@v4
         with:
           packages: "platform-tools emulator"
-      - name: Install Android 35 platform
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+      - name: Install Android 35 platform and emulator image
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+          image="system-images;android-35;google_apis;x86_64"
+          for attempt in 1 2 3; do
+            if sdkmanager --install "$image"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Android system image install failed (attempt $attempt); retrying."
+              rm -rf "$ANDROID_HOME/system-images/android-35/google_apis/x86_64"
+              sleep $((attempt * 5))
+            fi
+          done
+          exit 1
       - name: Install Gradle 8.9
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.9-bin.zip -o "$RUNNER_TEMP/gradle.zip"
