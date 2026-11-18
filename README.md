@@ -91,7 +91,7 @@ Run the repeated host QA gate:
 python scripts/run_release_qa.py
 ```
 
-Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile tests instantiate the Qt Widgets UI at phone dimensions on desktop runners, test tab switching and the preview queue, and check URL policy. They do not test on physical phones or emulators. The [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) also generates four current desktop/mobile UI screenshots as a review artifact. Android deployment is currently blocked by Qt's commercial-license credential gate; iOS target wheels/signing are not provisioned.
+Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile policy tests cover URL validation and ensure the mobile shell does not import the desktop downloader. The [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) renders the actual Qt widgets under Xvfb and generates four desktop/mobile UI screenshots as a review artifact. These are still desktop-hosted checks, not physical-phone or emulator tests. Android deployment is currently blocked by Qt's commercial-license credential gate; iOS target wheels/signing are not provisioned.
 
 ## Security model
 
