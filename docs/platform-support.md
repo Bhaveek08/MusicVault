@@ -8,8 +8,8 @@
 | macOS Apple Silicon | PySide6 desktop downloader | `.app` + `.dmg` | Build and packaged smoke test verified in CI; unsigned/notarized |
 | macOS Intel | Not packaged | None | Not currently supported as a release artifact |
 | Linux | Source/test environment only | None | No native installer |
-| Android | Touch-first UI prototype; phone-sized Qt UI tests on desktop runners | No APK/AAB; Qt Android deploy tool is blocked by its commercial-license credential gate in CI | Not supported |
-| iOS/iPadOS | Touch-first UI prototype; phone-sized Qt UI tests and host Xcode/Simulator SDK check | No IPA or simulator app; target PySide6/Shiboken wheels and signing are not provisioned | Not supported |
+| Android | Native Java WebView shell using shared local HTML/CSS/JS; download UI is preview-only | Debug APK builds and is uploaded as a 30-day Actions test artifact; latest emulator install smoke test failed with ADB `Broken pipe` after emulator boot timeout | Prototype only; not a public release |
+| iOS/iPadOS | Native SwiftUI/WKWebView shell using shared local HTML/CSS/JS; download UI is preview-only | Unsigned iOS Simulator app archive builds and launches in CI; no device IPA | Prototype only; not a public release |
 
 ## Desktop distribution
 
@@ -19,13 +19,14 @@ macOS uses a native `.app` bundle and DMG for Apple Silicon. The build creates a
 
 ## Mobile prototype scope
 
-The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side tests instantiate the Qt Widgets window at a phone-sized viewport, switch source tabs, exercise the permission/playlist preview queue, and check YouTube/Spotify URL validation. The Qt offscreen renderer is also used to capture review screenshots. These checks run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
+The native Android and iOS apps are small Java/WebView and SwiftUI/WKWebView shells that load the shared local HTML/CSS/JS. The separate `mobile/app/main.py` PySide6 prototype is used for host-side layout previews and URL-policy tests; it is not the native mobile application. The shared preview queue is local UI state only and does not download media.
 
-The mobile UI's preview queue is local UI state only. It does not download media. Automated source and URL-policy tests run on Ubuntu and Windows desktop hosts. Real widget screenshots are rendered under Xvfb in the Mobile UI workflow; the Linux Qt offscreen plugin crashed on the hosted runners and is intentionally not used. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
+Automated URL-policy tests run on desktop CI hosts. Real Qt prototype screenshots are rendered under Xvfb in the Mobile UI workflow; they are not screenshots of the native WebView apps. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
 
 - Qt's iOS deploy tool generates an Xcode project using platform-specific PySide6/Shiboken wheels and a Python.xcframework. The tool documentation states that third-party packages are not automatically supported; packages with C extensions need target-specific cross-compilation and app-bundle integration.
 - iOS requires sandbox-compliant file access, native sharing/export handling, app lifecycle/background-task design, privacy-purpose strings, provisioning, and App Store review.
-- The Android deploy attempt reached Qt's target-wheel download step but stopped at the Qt deploy tool's commercial-license credential gate on the public runner. The CI job records this as a known blocker; no APK/AAB or target wheel package is claimed. A package build needs licensed deployment credentials, Android SDK/NDK setup, and emulator/physical-device lifecycle, storage, permission, and network tests.
+- The current Android Gradle workflow builds a debug APK and uploads it as a temporary test artifact. Its emulator smoke test currently fails because the hosted emulator does not become usable before ADB disconnects; KVM acceleration has been enabled to retry this. The artifact is not a production downloader or Play Store build.
+- The iOS workflow builds and launches an unsigned Simulator app and uploads a simulator archive plus project source. This is not a device IPA or App Store build. Device distribution requires provisioning, signing, privacy disclosures, and store review.
 
 The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
@@ -36,8 +37,8 @@ Before Android or iOS can be called supported:
 1. Finish the platform-specific media pipeline, including FFmpeg conversion and a JavaScript challenge runtime where required, without attempting to run arbitrary external executables on iOS.
 2. Add app-sandbox file pickers/export flows and platform-specific storage permissions.
 3. Implement download lifecycle, resume/cancel semantics, battery/network constraints, and background behaviour.
-4. Generate native APK/AAB and iOS simulator/device builds using the official Qt toolchains.
-5. Add simulator/emulator tests and physical-device tests for app lifecycle, permission denial, storage exhaustion, network interruption, cancellation, and output-file integrity.
+4. Make the Android emulator smoke test reliable; then add physical-device tests for lifecycle, permission denial, storage exhaustion, network interruption, cancellation, and output-file integrity.
+5. Produce signed Android App Bundle and iOS device IPA packages using the native Gradle/Xcode projects, and validate installation on real devices.
 6. Complete signing, privacy disclosures, licensing/third-party notices, and store-policy review.
 
-Android and iOS require separate test evidence. Host-side phone-sized UI tests and deployment-readiness checks are preflight only; they are not evidence that downloads run correctly on a real phone. Review PNG screenshots from the `musicvault-ui-previews` artifact in the Mobile UI workflow.
+Android and iOS require separate test evidence. Host-side Qt prototype tests, an Android debug APK, and iOS Simulator launch checks do not prove that downloads run correctly on real phones. Review PNG screenshots from the `musicvault-ui-previews` artifact in the Mobile UI workflow.
