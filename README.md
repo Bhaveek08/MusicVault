@@ -25,8 +25,8 @@ MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions,
 | macOS Apple Silicon | Experimental desktop build pipeline verified in CI | `.app` + `.dmg`; unsigned and not notarized |
 | macOS Intel | Not packaged | Not currently supported as a release artifact |
 | Linux | Source/test environment only | No native installer |
-| Android | Touch-first UI prototype; host tests and deployment preflight in progress | No APK/AAB release |
-| iOS/iPadOS | Touch-first UI prototype; host tests and deployment preflight in progress | No IPA/App Store release |
+| Android | Touch-first UI prototype; desktop-hosted phone UI tests; native deployment blocked by Qt license gate | No APK/AAB |
+| iOS/iPadOS | Touch-first UI prototype; desktop-hosted phone UI tests; host Xcode readiness checked | No IPA or simulator app |
 
 The mobile workstream is separate from the desktop downloader. It currently contains a touch-first UI prototype and URL validation only; mobile media downloads are **not enabled**. The desktop downloader's Deno/FFmpeg/yt-dlp pipeline needs platform-specific porting, app-sandbox storage, and background-task work before a mobile build can be called functional. See [mobile workstream](mobile/README.md) and [platform support](docs/platform-support.md).
 
@@ -91,7 +91,7 @@ Run the repeated host QA gate:
 python scripts/run_release_qa.py
 ```
 
-Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile host tests cover source URL policy and the mobile UI structure, not native phone rendering. Android wheel retrieval and iOS SDK readiness checks are tracked in [Mobile CI](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml).
+Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile tests instantiate the Qt Widgets UI at phone dimensions on desktop runners, test tab switching and the preview queue, and check URL policy. They do not test on physical phones or emulators. The [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) also generates four current desktop/mobile UI screenshots as a review artifact. Android deployment is currently blocked by Qt's commercial-license credential gate; iOS target wheels/signing are not provisioned.
 
 ## Security model
 
@@ -113,7 +113,7 @@ No desktop application can be guaranteed free of all defects. Keep the OS and tr
 ├── musicvault_core.py            # validation and downloader configuration
 ├── assets/                       # app icon files
 ├── installer/                    # Windows installer and version metadata
-├── scripts/                      # platform build, staging, dev, and QA scripts
+├── scripts/                      # platform build, staging, dev, QA, and UI preview scripts
 ├── mobile/                       # mobile UI prototype and deployment config
 ├── tests/                        # core and mobile UI tests
 ├── docs/                         # architecture, platform, security, and release docs
