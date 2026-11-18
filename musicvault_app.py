@@ -123,8 +123,8 @@ class MusicVaultWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} — Downloads")
-        self.setMinimumSize(780, 590)
-        self.resize(980, 700)
+        self.setMinimumSize(980, 760)
+        self.resize(1120, 840)
         self.jobs: list[Job] = []
         self.worker: Worker | None = None
         self.cancel_event = threading.Event()
@@ -139,8 +139,8 @@ class MusicVaultWindow(QMainWindow):
         card = QFrame()
         card.setObjectName("Card")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(18, 16, 18, 16)
-        layout.setSpacing(12)
+        layout.setContentsMargins(20, 18, 20, 18)
+        layout.setSpacing(14)
         label = QLabel(title)
         label.setObjectName("SectionTitle")
         layout.addWidget(label)
@@ -151,8 +151,8 @@ class MusicVaultWindow(QMainWindow):
         root.setObjectName("Root")
         self.setCentralWidget(root)
         outer = QVBoxLayout(root)
-        outer.setContentsMargins(24, 20, 24, 18)
-        outer.setSpacing(18)
+        outer.setContentsMargins(28, 20, 28, 14)
+        outer.setSpacing(16)
 
         # Compact app header.
         header = QHBoxLayout()
@@ -185,14 +185,14 @@ class MusicVaultWindow(QMainWindow):
         outer.addLayout(header)
 
         columns = QHBoxLayout()
-        columns.setSpacing(16)
+        columns.setSpacing(20)
 
         # Left: source and export controls.
         left_column = QVBoxLayout()
-        left_column.setSpacing(14)
+        left_column.setSpacing(18)
 
         intro = QVBoxLayout()
-        intro.setSpacing(4)
+        intro.setSpacing(7)
         page_title = QLabel("Downloads")
         page_title.setObjectName("PageTitle")
         intro.addWidget(page_title)
@@ -208,8 +208,8 @@ class MusicVaultWindow(QMainWindow):
 
         youtube = QWidget()
         ybox = QVBoxLayout(youtube)
-        ybox.setContentsMargins(14, 16, 14, 16)
-        ybox.setSpacing(14)
+        ybox.setContentsMargins(12, 10, 12, 10)
+        ybox.setSpacing(16)
 
         source_card, source_layout = self._card("YouTube")
         source_hint = QLabel("Paste a video or playlist URL")
@@ -249,7 +249,7 @@ class MusicVaultWindow(QMainWindow):
         format_group.addWidget(format_label)
         self.format_box = QComboBox()
         self.format_box.addItems(ALL_FORMATS)
-        self.format_box.setMinimumHeight(42)
+        self.format_box.setMinimumHeight(46)
         self.format_box.setAccessibleName("Output format")
         format_group.addWidget(self.format_box)
         settings_row.addLayout(format_group, 1)
@@ -260,7 +260,7 @@ class MusicVaultWindow(QMainWindow):
         playlist_label.setObjectName("Eyebrow")
         playlist_group.addWidget(playlist_label)
         self.playlist_check = QCheckBox("Full playlist")
-        self.playlist_check.setMinimumHeight(42)
+        self.playlist_check.setMinimumHeight(46)
         playlist_group.addWidget(self.playlist_check)
         settings_row.addLayout(playlist_group, 1)
         settings_layout.addLayout(settings_row)
@@ -276,22 +276,24 @@ class MusicVaultWindow(QMainWindow):
         self.folder_label.setObjectName("PathLabel")
         self.folder_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.folder_label.setWordWrap(False)
-        self.folder_label.setMinimumHeight(34)
+        self.folder_label.setMinimumHeight(36)
+        self.folder_label.setToolTip(self.output_dir)
         folder_stack.addWidget(self.folder_label)
         folder_row.addLayout(folder_stack, 1)
 
         browse = MotionButton("Change")
         browse.setObjectName("SecondaryButton")
-        browse.setMinimumHeight(40)
+        browse.setMinimumHeight(44)
         browse.clicked.connect(self.choose_folder)
         folder_row.addWidget(browse, 0, Qt.AlignBottom)
         settings_layout.addLayout(folder_row)
 
         add_button = MotionButton("Add to queue")
         add_button.setObjectName("YoutubeButton")
-        add_button.setMinimumHeight(46)
+        add_button.setMinimumHeight(50)
         add_button.clicked.connect(self.add_to_queue)
         settings_layout.addWidget(add_button)
+        settings_card.setMinimumHeight(286)
         ybox.addWidget(settings_card)
         ybox.addStretch(1)
 
@@ -341,7 +343,7 @@ class MusicVaultWindow(QMainWindow):
 
         # Right: live queue and concise format reference.
         right_column = QVBoxLayout()
-        right_column.setSpacing(14)
+        right_column.setSpacing(16)
 
         queue_card, queue_layout = self._card("Download queue")
         queue_header = QHBoxLayout()
@@ -362,7 +364,7 @@ class MusicVaultWindow(QMainWindow):
         self.queue_empty.setWordWrap(True)
         self.queue_list = QListWidget()
         self.queue_list.setObjectName("QueueList")
-        self.queue_list.setMinimumHeight(218)
+        self.queue_list.setMinimumHeight(176)
         self.queue_list.setAccessibleName("Download queue")
         self.queue_stack.addWidget(self.queue_empty)
         self.queue_stack.addWidget(self.queue_list)
@@ -442,12 +444,14 @@ class MusicVaultWindow(QMainWindow):
             QCheckBox::indicator { width:16px; height:16px; }
             QCheckBox::indicator:unchecked { background:#0B0E13; border:1px solid #4B5664; border-radius:4px; }
             QCheckBox::indicator:checked { background:#A8BCE0; border:1px solid #A8BCE0; border-radius:4px; }
-            QTabWidget::pane { border:1px solid #252C35; border-radius:13px; background:#111419; top:-1px; }
-            QTabBar::tab { background:#101318; color:#87909C; padding:11px 22px; margin-right:6px;
-                           border:1px solid #252C35; border-bottom:0; border-top-left-radius:9px;
-                           border-top-right-radius:9px; font-weight:650; }
-            QTabBar::tab:selected { color:#FFFFFF; background:#191E26; border-color:#374252; }
-            QTabBar::tab:hover:!selected { color:#D8DDE5; background:#171B21; }
+            QTabWidget#SourceTabs { background:transparent; }
+            QTabWidget#SourceTabs::pane { border:0; background:transparent; top:0; }
+            QTabWidget#SourceTabs::tab-bar { background:transparent; }
+            QTabBar::tab { min-width:112px; background:#151A21; color:#A6B0BD;
+                           padding:12px 22px; margin-right:8px; border:1px solid #303A47;
+                           border-radius:10px; font-weight:680; }
+            QTabBar::tab:selected { color:#FFFFFF; background:#351B20; border-color:#8C414A; }
+            QTabBar::tab:hover:!selected { color:#E4E8ED; background:#202731; }
             QPushButton { border:0; border-radius:9px; padding:10px 15px; font-weight:650; }
             QPushButton:hover { padding-top:9px; padding-bottom:11px; }
             QPushButton:pressed { padding-top:11px; padding-bottom:9px; }
