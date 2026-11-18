@@ -1,0 +1,1 @@
+"""MusicVault mobile client workstream."""
