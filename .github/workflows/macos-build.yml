@@ -1,0 +1,34 @@
+name: macOS build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build MusicVault for macOS Apple Silicon
+    runs-on: macos-15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: arm64
+      - name: Build app bundle and disk image
+        run: ./build_macos.sh
+      - name: Upload macOS installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: musicvault-macos-arm64
+          path: |
+            dist/MusicVault-macos-arm64.dmg
+            THIRD_PARTY_NOTICES.txt
+          if-no-files-found: error
+          retention-days: 14

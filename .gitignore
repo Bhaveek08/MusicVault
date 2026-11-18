@@ -1,0 +1,38 @@
+# Python
+.venv/
+venv/
+__pycach__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*ns.py[cod]
+*ns.egg-info/
+
+# Packaging and downloaded runtimes
+build/
+dist/
+.spec
+vendor/
+.build-deno/
+.build-deno-macos/
+.venv-macos/*.dmg
+*.app/
+
+# Local application/developer data
+*.log
+.env
+.env.*
+*.env.example
+.vscode/
+.idea/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Generated macOS icon composition files
+assets/*.iconset/

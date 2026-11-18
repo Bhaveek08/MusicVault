@@ -1,0 +1,14 @@
+[project]
+name = "musicvault"
+version = "2.0.0"
+description = "A lightweight desktop app for YouTube media downloads and Spotify link hand-off."
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

@@ -1,0 +1,42 @@
+name: Windows build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build MusicVault for Windows x64
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: x64
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Run release build
+        shell: cmd
+        run: |
+          set CI=1
+          build_windows.bat
+      - name: Upload executable and notices
+        uses: actions/upload-artifact@v4
+        with:
+          name: musicvault-windows-x64
+          path: |
+            dist/MusicVault-Setup.exe
+            dist/MusicVault/**
+            THIRD_PARTY_NOTICES.txt
+            QA_REPORT.md
+          if-no-files-found: error
+          retention-days: 14

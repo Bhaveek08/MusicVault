@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible problem with MusicVault.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove private URLs, tokens, usernames, local personal paths, and other sensitive information before submitting.
+  - type: input
+    id: version
+    attributes:
+      label: MusicVault version
+      placeholder: 1.1.0
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and architecture
+      placeholder: Windows 11 24H2, x64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest set of steps that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostic output
+      description: Remove URLs, file paths containing personal information, account names, cookies, and credentials.
+    validations:
+      required: false
