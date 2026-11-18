@@ -50,7 +50,6 @@ python -m PyInstaller --noconfirm --clean --onedir --windowed ^
   --add-data "assets\musicvault-icon.png;assets" ^
   --add-data "assets\musicvault.ico;assets" ^
   --add-binary "vendor\deno.exe;." ^
-  --collect-all PySide6 ^
   --collect-all shiboken6 ^
   --collect-all yt_dlp ^
   --collect-all yt_dlp_ejs ^
