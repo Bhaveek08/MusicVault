@@ -628,6 +628,11 @@ def main() -> int:
     app.setOrganizationName(APP_NAME)
     window = MusicVaultWindow()
     if args.smoke_test:
+        # Exercise real widget construction, layout, paint, and orderly teardown.
+        window.show()
+        app.processEvents()
+        window.close()
+        app.processEvents()
         return 0
     window._animate_intro()
     return app.exec()
