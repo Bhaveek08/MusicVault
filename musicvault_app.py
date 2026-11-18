@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 )
 
 from musicvault_core import (
-    APP_NAME, APP_VERSION, DownloadCancelled, build_ytdlp_options,
+    APP_NAME, APP_VERSION, DownloadCancelled, build_ydl_options,
     describe_download_error, find_deno, find_ffmpeg, validate_output_folder,
     validate_source_url, validate_spotify_url,
 )
@@ -74,7 +74,7 @@ class Worker(QThread):
                     elif state == "finished":
                         self.progress.emit(index, 99, "Converting", "")
 
-                options = build_ytdlp_options(
+                options = build_ydl_options(
                     url=job.url,
                     output_dir=job.output_dir,
                     output_format=job.output_format,
