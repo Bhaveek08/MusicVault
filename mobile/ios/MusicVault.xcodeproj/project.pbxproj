@@ -1,0 +1,117 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {};
+    objectVersion = 56;
+    objects = {
+        A10000000000000000000001 /* MusicVaultApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001; };
+        A10000000000000000000002 /* shared in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
+        B10000000000000000000001 /* MusicVaultApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicVaultApp.swift; sourceTree = "<group>"; };
+        B10000000000000000000002 /* shared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../shared; sourceTree = "<group>"; };
+        B10000000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+        B10000000000000000000004 /* MusicVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
+        C10000000000000000000001 = {
+            isa = PBXGroup;
+            children = (C10000000000000000000002, B10000000000000000000004,);
+            sourceTree = "<group>";
+        };
+        C10000000000000000000002 /* MusicVault */ = {
+            isa = PBXGroup;
+            children = (B10000000000000000000001, B10000000000000000000002, B10000000000000000000003,);
+            path = MusicVault;
+            sourceTree = "<group>";
+        };
+        D10000000000000000000001 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (A10000000000000000000001,);
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        D10000000000000000000002 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (A10000000000000000000002,);
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        E10000000000000000000001 /* MusicVault */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = F10000000000000000000002;
+            buildPhases = (D10000000000000000000001, D10000000000000000000002,);
+            buildRules = ();
+            dependencies = ();
+            name = MusicVault;
+            productName = MusicVault;
+            productReference = B10000000000000000000004;
+            productType = "com.apple.product-type.application";
+        };
+        E10000000000000000000002 /* Project */ = {
+            isa = PBXProject;
+            attributes = { LastUpgradeCheck = 1600; };
+            buildConfigurationList = F10000000000000000000001;
+            compatibilityVersion = "Xcode 14.0";
+            developmentRegion = en;
+            hasScannedForEncodings = 0;
+            knownRegions = (en, Base,);
+            mainGroup = C10000000000000000000001;
+            productRefGroup = C10000000000000000000001;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (E10000000000000000000001,);
+        };
+        F10000000000000000000001 = {
+            isa = XCConfigurationList;
+            buildConfigurations = (G10000000000000000000001, G10000000000000000000002,);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        F10000000000000000000002 = {
+            isa = XCConfigurationList;
+            buildConfigurations = (G10000000000000000000003, G10000000000000000000004,);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        G10000000000000000000001 /* Project Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 16.0; SWIFT_VERSION = 5.0; };
+            name = Debug;
+        };
+        G10000000000000000000002 /* Project Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = { SDKROOT = iphoneos; IPHONEOS_DEPLOYMENT_TARGET = 16.0; SWIFT_VERSION = 5.0; };
+            name = Release;
+        };
+        G10000000000000000000003 /* Target Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                GENERATE_INFOPLIST_FILE = NO;
+                INFOPLIST_FILE = MusicVault/Info.plist;
+                PRODUCT_BUNDLE_IDENTIFIER = com.musicvault.mobile;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_VERSION = 5.0;
+                IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                SUPPORTS_MACCATALYST = NO;
+                CODE_SIGNING_ALLOWED = NO;
+                CODE_SIGNING_REQUIRED = NO;
+            };
+            name = Debug;
+        };
+        G10000000000000000000004 /* Target Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                GENERATE_INFOPLIST_FILE = NO;
+                INFOPLIST_FILE = MusicVault/Info.plist;
+                PRODUCT_BUNDLE_IDENTIFIER = com.musicvault.mobile;
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_VERSION = 5.0;
+                IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                SUPPORTS_MACCATALYST = NO;
+                CODE_SIGNING_ALLOWED = NO;
+                CODE_SIGNING_REQUIRED = NO;
+            };
+            name = Release;
+        };
+    };
+    rootObject = E10000000000000000000002;
+}
