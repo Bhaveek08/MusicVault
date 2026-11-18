@@ -450,7 +450,7 @@ class MusicVaultWindow(QMainWindow):
             QTabBar::tab:selected { color:#FFFFFF; background:#191E26; border-color:#3A4553; }
             QTabBar::tab:hover:!selected { color:#FFFFFF; background:#1A2028; }
             QPushButton { border:0; border-radius:10px; padding:10px 15px; font-weight:680; }
-            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }
+            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }\n            QPushButton#YoutubeButton:focus, QPushButton#SpotifyButton:focus, QPushButton#SecondaryButton:focus,\n            QPushButton#StopButton:focus, QPushButton#TextButton:focus, QPushButton#YoutubeTab:focus,\n            QPushButton#SpotifyTab:focus { border:2px solid #F4F6F8; }
             QPushButton:pressed { padding:10px 15px; }
             QPushButton:disabled { background:#252A31; color:#A6B0BD; }
             QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; }
