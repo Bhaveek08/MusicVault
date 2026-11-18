@@ -32,7 +32,7 @@ class AnimatedButton(QPushButton):
         self._opacity = QGraphicsOpacityEffect(self)
         self._opacity.setOpacity(1.0)
         self.setGraphicsEffect(self._opacity)
-        self._fade = QPropertyAnimation(self._opacity, b"opacity", self)
+        self._fade = QPropertyAnimation(self._opacity, b"opacity", self._opacity)
         self._fade.setDuration(105)
         self._fade.setEasingCurve(QEasingCurve.OutCubic)
         self.pressed.connect(lambda: self._animate(0.84))
