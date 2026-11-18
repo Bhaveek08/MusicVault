@@ -6,11 +6,21 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
+import shiboken6
 from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton, QTabWidget
 
 import musicvault_app
 from musicvault_app import MusicVaultWindow
+
+
+def pytest_unconfigure(_config):
+    # PySide6 6.12 can segfault at interpreter shutdown unless the QApplication
+    # wrapper is explicitly destroyed after all top-level windows are closed.
+    app = QApplication.instance()
+    if app is not None:
+        app.quit()
+        shiboken6.delete(app)
 
 
 @pytest.fixture
@@ -28,6 +38,7 @@ def window(tmp_path, monkeypatch):
     yield instance
     instance.close()
     app.processEvents()
+    shiboken6.delete(instance)
 
 
 @pytest.fixture
