@@ -5,7 +5,7 @@ This directory contains the first touch-first MusicVault UI shell for Android an
 ## Status
 
 - The UI shell is an early prototype. It is not a released Android or iOS app.
-- Automated desktop-host UI tests check the mobile layout at phone-sized viewports, tab selection, and URL validation.
+- Automated host-side tests check the mobile UI source structure and YouTube/Spotify URL validation. They do not render a native phone UI.
 - The preview queue is local UI state only. It does not start a media download.
 - The desktop downloader is deliberately not imported into this shell.
 
@@ -21,8 +21,8 @@ Install the pinned desktop runtime dependencies and run:
 
 ```bash
 python -m pip install -r requirements-test.txt
-QT_QPA_PLATFORM=offscreen python -m pytest -q tests/test_mobile_ui.py
-python mobile/app/main.py --smoke-test
+python -m pytest -q tests/test_mobile_ui.py
+python mobile/app/main.py
 ```
 
 ## Native deployment prerequisites
