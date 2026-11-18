@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   mobile-ui:
-    name: Phone UI tests (${{ matrix.os }})
+    name: Mobile UI policy tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -37,7 +37,7 @@ jobs:
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0
       - name: Install UI test dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Exercise phone-sized layouts and interactions
+      - name: Test mobile URL policy and UI structure
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest -q tests/test_mobile_ui.py
