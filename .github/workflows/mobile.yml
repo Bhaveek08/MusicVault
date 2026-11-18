@@ -20,8 +20,8 @@ permissions:
   contents: read
 
 jobs:
-  mobile-ui:
-    name: Mobile UI tests (${{ matrix.os }})
+  mobile-policy:
+    name: Mobile source and URL policy tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -32,24 +32,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install Linux Qt runtime libraries
-        if: runner.os == 'Linux'
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Test YouTube/Spotify URL policy and mobile source boundaries
+        run: python -m pytest -q tests/test_mobile_ui.py
+
+  ui-preview:
+    name: Render current desktop and mobile UI previews
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install X11 and Qt runtime libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libegl1 libgl1 libxkbcommon0
-      - name: Install UI test dependencies
+          sudo apt-get install -y xvfb libegl1 libgl1 libxkbcommon0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0
+      - name: Install MusicVault UI dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Test mobile URL policy and phone-sized UI
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: python -m pytest -q tests/test_mobile_ui.py
-      - name: Capture desktop and mobile UI previews
-        if: runner.os == 'Linux'
-        env:
-          QT_QPA_PLATFORM: offscreen
-        run: python scripts/capture_ui_previews.py --output artifacts/ui-preview
+      - name: Render current UI screenshots using virtual X11
+        run: xvfb-run -a python scripts/capture_ui_previews.py --output artifacts/ui-preview
       - name: Upload UI preview images
-        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: musicvault-ui-previews
@@ -64,7 +68,7 @@ jobs:
       - name: Record the current build blocker
         run: |
           echo "::warning::Qt for Python Android target wheel deployment currently requires Qt commercial-license credentials on the public runner. No APK/AAB build or Android device test is being claimed."
-          echo "Android UI is exercised by the phone-sized desktop-host tests above."
+          echo "Android UI policy tests run on Windows and Ubuntu desktop hosts."
           echo "A native Android build remains blocked pending a licensed Qt deployment toolchain."
 
   ios-toolchain-check:
@@ -79,14 +83,12 @@ jobs:
         run: |
           xcodebuild -version
           xcrun --sdk iphonesimulator --show-sdk-version
-      - name: Install host Qt for Python wheels
+      - name: Install host Qt for Python test dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Verify shared mobile validation and UI imports
-        env:
-          QT_QPA_PLATFORM: offscreen
+      - name: Verify mobile validation and UI imports
         run: |
           python -c "from mobile.app.source_validation import validate_youtube_link; from mobile.app.main import MusicVaultMobileWindow; assert validate_youtube_link('https://youtu.be/BaW_jenozKc') == 'video'; print(MusicVaultMobileWindow.__name__)"
       - name: Record iOS deployment boundary
         run: |
-          echo "::warning::Host Xcode/Simulator SDK is available, but target-specific PySide6/Shiboken6 iOS wheels and signing are not provisioned. No IPA or simulator app build is being claimed."
-          echo "iOS UI is exercised by host-side phone-sized Qt tests; simulator/device validation remains pending."
+          echo "::warning::Host Xcode/Simulator SDK is available, but target-specific PySide6/Shiboken iOS wheels and signing are not provisioned. No IPA or simulator app build is being claimed."
+          echo "iOS URL policy and mobile UI imports are checked on desktop/macOS CI; simulator/device validation remains pending."
