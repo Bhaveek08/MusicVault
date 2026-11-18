@@ -100,8 +100,20 @@ jobs:
           )
           if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
             $tag = $env:RELEASE_VERSION
-            if ($tag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+
-) {
+            $validTag = $tag.StartsWith('v')
+            $versionParts = @()
+            if ($validTag) {
+              $versionParts = $tag.Substring(1).Split('.')
+              $validTag = $versionParts.Length -eq 3
+            }
+            if ($validTag) {
+              foreach ($part in $versionParts) {
+                if ($part.Length -eq 0 -or $part -match '[^0-9]') {
+                  $validTag = $false
+                }
+              }
+            }
+            if (-not $validTag) {
               throw "Release version must use the vX.Y.Z format."
             }
             gh release create $tag $assets --title "MusicVault $tag" --generate-notes --target $env:GITHUB_SHA
