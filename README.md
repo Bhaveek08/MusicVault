@@ -30,6 +30,19 @@ MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions,
 
 The mobile workstream is separate from the desktop downloader. It currently contains a touch-first UI prototype and URL validation only; mobile media downloads are **not enabled**. The desktop downloader's Deno/FFmpeg/yt-dlp pipeline needs platform-specific porting, app-sandbox storage, and background-task work before a mobile build can be called functional. See [mobile workstream](mobile/README.md) and [platform support](docs/platform-support.md).
 
+## UI preview
+
+The latest screenshots are generated from the current Qt application widgets during the [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) and checked into `docs/ui-preview/` for easy review:
+
+| View | Screenshot |
+| --- | --- |
+| Desktop — YouTube | [Open PNG](docs/ui-preview/desktop-youtube.png) |
+| Desktop — Spotify | [Open PNG](docs/ui-preview/desktop-spotify.png) |
+| Mobile prototype — YouTube | [Open PNG](docs/ui-preview/mobile-prototype-youtube.png) |
+| Mobile prototype — Spotify | [Open PNG](docs/ui-preview/mobile-prototype-spotify.png) |
+
+The mobile images are touch-first prototypes rendered at 390 × 844 on a virtual desktop, not Android/iOS device captures. Mobile downloading is not enabled.
+
 ## Install
 
 ### Windows
