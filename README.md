@@ -91,7 +91,7 @@ Run the repeated host QA gate:
 python scripts/run_release_qa.py
 ```
 
-Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile UI smoke tests use phone-sized viewports on desktop runners. Native Android/iOS deployment preflight is tracked in [Mobile CI](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml).
+Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile host tests cover source URL policy and the mobile UI structure, not native phone rendering. Android wheel retrieval and iOS SDK readiness checks are tracked in [Mobile CI](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml).
 
 ## Security model
 
@@ -122,7 +122,7 @@ No desktop application can be guaranteed free of all defects. Keep the OS and tr
 
 ## Third-party components
 
-MusicVault uses PySide6/Qt for Python, yt-dlp, yt-dlp-ejs, imageio-ffmpeg/FFmpeg, PyInstaller, and Deno. See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Review upstream licenses before redistributing binaries. The bundled desktop media runtime adds significant installer size; the app does not install a background service.
+MusicVault uses PySide6-Essentials/Qt for Python, yt-dlp, yt-dlp-ejs, imageio-ffmpeg/FFmpeg, PyInstaller, and Deno. See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Review upstream licenses before redistributing binaries. The bundled desktop media runtime adds significant installer size; the app does not install a background service.
 
 ## License
 
