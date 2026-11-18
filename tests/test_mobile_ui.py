@@ -35,12 +35,12 @@ def test_youtube_rejects_unsafe_or_malformed_links(url):
 
 
 @pytest.mark.parametrize("url", [
-    "https://open.spotify.com/track/12345678901234567890",
-    "https://open.spotify.com/album/12345678901234567890",
-    "https://open.spotify.com/playlist/12345678901234567890",
-    "https://open.spotify.com/artist/12345678901234567890",
-    "https://open.spotify.com/show/12345678901234567890",
-    "https://open.spotify.com/episode/12345678901234567890",
+    "https://open.spotify.com/track/1234567890123456789012",
+    "https://open.spotify.com/album/1234567890123456789012",
+    "https://open.spotify.com/playlist/1234567890123456789012",
+    "https://open.spotify.com/artist/1234567890123456789012",
+    "https://open.spotify.com/show/1234567890123456789012",
+    "https://open.spotify.com/episode/1234567890123456789012",
     "https://spotify.link/AbCdEf",
 ])
 def test_spotify_official_share_links(url):
@@ -48,12 +48,12 @@ def test_spotify_official_share_links(url):
 
 
 @pytest.mark.parametrize("url", [
-    "http://open.spotify.com/track/12345678901234567890",
-    "https://spotify.com.evil.example/track/12345678901234567890",
-    "https://evil.example/track/12345678901234567890",
-    "https://user:pass@open.spotify.com/track/12345678901234567890",
-    "https://open.spotify.com:444/track/12345678901234567890",
-    "https://open.spotify.com/not-a-type/12345678901234567890",
+    "http://open.spotify.com/track/1234567890123456789012",
+    "https://spotify.com.evil.example/track/1234567890123456789012",
+    "https://evil.example/track/1234567890123456789012",
+    "https://user:pass@open.spotify.com/track/1234567890123456789012",
+    "https://open.spotify.com:444/track/1234567890123456789012",
+    "https://open.spotify.com/not-a-type/1234567890123456789012",
     "https://open.spotify.com/track/short",
     "",
     "x" * 3000,
