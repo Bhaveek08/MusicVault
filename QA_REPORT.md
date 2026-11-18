@@ -1,69 +1,47 @@
-# MusicVault 2.0.0 — QA report
+# MusicVault 2.0.1 — QA report
 
-## Automated test matrix
+## Release artifacts
 
-GitHub Actions CI completed successfully for commit `a7be99f9a75fa5a9d99132a8db13fa2c726d1337` on all six combinations:
+The public [v2.0.1 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.1) contains:
 
-| Runner | Python | Repeated runs | Result |
+| Platform | Asset | Verification | Distribution caveat |
+| --- | --- | --- | --- |
+| Windows 10/11 x64 | `MusicVault-Setup.exe`, `MusicVault-Windows-x64.zip` | Windows build, packaged `--smoke-test`, and installer compilation passed in [release workflow 44415036837](https://github.com/Bhaveek08/MusicVault/actions/runs/44415036837). | Installer is unsigned. |
+| macOS Apple Silicon | `MusicVault-macos-arm64.dmg` | App-bundle smoke test and DMG creation passed in [macOS workflow 44415984028](https://github.com/Bhaveek08/MusicVault/actions/runs/44415984028). | DMG is unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
+| Android | No production release asset | The repository contains a prototype UI, not a complete downloader. | No supported installable release. |
+| iOS/iPadOS | No device-installable release asset | The repository contains a prototype UI, not a complete downloader. | No signed IPA/TestFlight/App Store build. |
+
+The Windows release job and macOS package job are independent. The macOS DMG was attached after its successful build. Release assets are not code-signed by the current pipelines.
+
+## Automated regression matrix
+
+Commit [`7dfc8e4`](https://github.com/Bhaveek08/MusicVault/commit/7dfc8e4e6339898726c08194cb2396a0f907ff81) passed the six-job [CI run 44417329152](https://github.com/Bhaveek08/MusicVault/actions/runs/44417329152) and [CodeQL run 44417329198](https://github.com/Bhaveek08/MusicVault/actions/runs/44417329198):
+
+| Runner | Python | Full-suite repetitions | Result |
 | --- | --- | ---: | --- |
-| Ubuntu latest | 3.11 | 50 | Passed |
-| Ubuntu latest | 3.13 | 50 | Passed |
 | Windows latest | 3.11 | 50 | Passed |
 | Windows latest | 3.13 | 50 | Passed |
-| macOS 15 (Apple Silicon) | 3.11 | 50 | Passed |
-| macOS 15 (Apple Silicon) | 3.13 | 50 | Passed |
+| Ubuntu latest | 3.11 | 50 | Passed |
+| Ubuntu latest | 3.13 | 50 | Passed |
+| macOS 15 | 3.11 | 50 | Passed |
+| macOS 15 | 3.13 | 50 | Passed |
 
-Each job runs `run_release_qa.py`, which repeats the current pytest suite 50 times and stops on the first failure. The current repository suite contains **33 pytest cases**, including parameterized cases.
+The suite contains 77 pytest cases, including parameterized cases. CI therefore ran 300 complete suite repetitions (23,100 passing test-case executions). These are repeats of the same deterministic tests, not independent test plans or physical-device trials. The desktop Qt test harness explicitly closes and destroys its windows to avoid a PySide process-exit crash.
 
-- Complete suite runs: **300** (50 on each of six runner/Python combinations)
-- Passing test-case executions: **9,900**
-- Failed test runs: **0**
-- Result: **PASS for the tested source-level behaviours on the listed GitHub-hosted runners**
+## What the tests cover
 
-These are repeated executions of one deterministic suite, not 50 independent devices or 50 independently designed test plans per platform.
+- Safe YouTube video/playlist and Spotify URL acceptance and rejection.
+- Queue permission gating, invalid URL errors, playlist-only handling, valid queue add, completion clearing, queue counts, progress, and failed-job state.
+- Spotify tab handoff, valid link opening, invalid-link errors, and open failure recovery.
+- Visible desktop button geometry at the configured minimum window size and supported format choices.
+- Output folder validation, output option construction, format mapping, helper formatting, and app identity.
+- Download option constraints that disable cookies, plugins, and remote components.
 
-## Test coverage
+## Platform and security boundaries
 
-1. Accepted YouTube video and playlist URL forms, and extraction of their video/playlist identifiers.
-2. Rejection of unsafe YouTube links including HTTP, deceptive host suffixes, arbitrary hosts, embedded credentials, non-standard ports, unsupported schemes, and oversized inputs.
-3. Separation of Spotify from the download engine.
-4. Validation of supported official Spotify hand-off links, and rejection of unsafe Spotify links.
-5. Per-user application data path selection for Windows and macOS.
-6. Creation and basic write access validation for the selected output directory.
-7. yt-dlp option construction for MP3, WAV, FLAC, M4A, AAC, OPUS, and MKV.
-8. Checks that generated download options do not enable cookie-file access and keep remote components disabled.
-9. The current MP3 export quality target (320 kbps).
-10. Handling of invalid values in byte-size and ETA display helpers.
-11. Application name and version identity.
-
-## Native packaging verification
-
-Both platform-specific GitHub Actions packaging jobs completed successfully for the public repository:
-
-| Platform | Result | Artifact |
-| --- | --- | --- |
-| Windows x64 | Passed — build and packaged smoke test | [Download Windows build](https://github.com/Bhaveek08/MusicVault/actions/runs/44306071742/artifacts/14429435283) |
-| macOS 15 / Apple Silicon | Passed — build and packaged smoke test | [Download macOS DMG](https://github.com/Bhaveek08/MusicVault/actions/runs/44306072060/artifacts/14429270149) |
-
-The Windows workflow built a windowed PyInstaller payload, ran the packaged executable with `--smoke-test`, compiled the per-user Inno Setup installer, and uploaded the installer plus payload. The macOS workflow built the Apple Silicon `.app`, ran the packaged offscreen smoke test, created a DMG, and uploaded it.
-
-These workflow artifacts are temporary (currently retained for 14 days). The Windows installer is not code-signed. The macOS build is unsigned and not notarized, so macOS may show a security warning and wider distribution requires Apple Developer ID signing and notarization.
-
-## Platform boundaries
-
-- **Windows 10/11 x64:** desktop source tests and native installer build passed on GitHub Actions.
-- **macOS 15 Apple Silicon:** desktop source tests and native app/DMG build passed on GitHub Actions.
-- **Linux:** source test matrix passed; no native Linux installer is provided.
-- **Android/iOS:** no mobile clients exist in this repository; no mobile build or test is claimed.
-
-The Python test matrix does **not** render or manually interact with the UI, run a live YouTube transfer, validate every downloaded media file, test installer upgrades/uninstalls on a physical user's device, or certify code signing/notarization. The offscreen packaged smoke tests verify app startup and bundled-runtime resolution, not every UI interaction.
-
-## Important limitations
-
-The suite does not prove every public YouTube URL will download. Provider availability, network behaviour, and platform restrictions remain outside the unit-test environment. MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions, or platform access controls. Spotify links are handed off to Spotify; protected streaming tracks are not exported to MP3/WAV files.
-
-The tests check requested output-format option mapping, not a full encode/decode round trip for every format in the committed GitHub suite. A live download and decoded output should be checked before attaching any binary to a permanent public release.
-
-Lossy re-encoding cannot restore information absent from the source. MusicVault requests a 320 kbps target for the formats configured as lossy exports; source quality remains the ceiling. WAV/FLAC are not constrained by a lossy bitrate cap.
-
-No test suite proves an application has zero defects.
+- The desktop app downloads only public YouTube sources accepted by its URL policy and requires the user to confirm they own or may save the content. It does not read browser cookies or export protected Spotify streams.
+- The automated tests do not perform live media downloads, decode every output format, test installer upgrades/uninstalls on physical devices, or prove every screenreader, DPI, theme, and keyboard path.
+- The Android and iOS UIs remain prototypes. Their appearance or host-side validation does not prove native download, background-task, storage, lifecycle, signing, or store behavior.
+- No client application can be made cheat-engine-proof. Obfuscation can raise reverse-engineering effort but cannot secure logic running on a user's device.
+- Windows and macOS binaries are currently unsigned; macOS also lacks notarization. Public deployment should add trusted signing/notarization and verify downloaded checksums.
+- No test suite proves that software has zero defects.
