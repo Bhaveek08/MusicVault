@@ -32,3 +32,20 @@ Android deployment uses Qt for Python's `pyside6-android-deploy` tool on a Linux
 iOS deployment uses `pyside6-ios-deploy` on macOS with Xcode, a Python.xcframework, and matching PySide6/Shiboken6 wheels for the iOS device or simulator target. The tool generates an Xcode project; Xcode performs the build and signing.
 
 See [Qt for Python Android deployment](https://doc.qt.io/qtforpython-6/deployment/deployment-pyside6-android-deploy.html) and [iOS deployment](https://doc.qt.io/qtforpython-6/deployment/deployment-pyside6-ios-deploy.html).
+
+
+## UI review screenshots
+
+The Mobile UI workflow generates four PNGs from the real Qt widgets, using the current source code:
+
+- Desktop YouTube tab — 1200 × 820
+- Desktop Spotify tab — 1200 × 820
+- Mobile YouTube prototype — 390 × 844
+- Mobile Spotify prototype — 390 × 844
+
+Open the latest [Mobile UI workflow run](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) and download the `musicvault-ui-previews` artifact. These are host-rendered app screenshots, not device screenshots.
+
+## Current native build blockers
+
+- **Android:** the CI attempt to obtain Qt Android target wheels reached a commercial-license credential gate. No native APK/AAB is generated. The workflow reports this blocker without marking host-side UI tests as failed.
+- **iOS:** the CI runner verifies Xcode and the iOS Simulator SDK, but matching target PySide6/Shiboken wheels, app signing and a simulator app build are not yet configured.
