@@ -1,0 +1,92 @@
+name: Mobile UI and deployment preflight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - "tests/test_mobile_ui.py"
+      - ".github/workflows/mobile.yml"
+  pull_request:
+    paths:
+      - "mobile/**"
+      - "tests/test_mobile_ui.py"
+      - ".github/workflows/mobile.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-ui:
+    name: Phone UI tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install UI test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Exercise phone-sized layouts and interactions
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q tests/test_mobile_ui.py
+
+  android-deploy-preflight:
+    name: Android arm64 deployment dry-run
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Qt for Python deploy tools
+        run: python -m pip install PySide6==6.12.0 qtpip
+      - name: Download Qt Android wheels
+        working-directory: mobile
+        run: |
+          qtpip download PySide6 --android --arch aarch64
+          qtpip download shiboken6 --android --arch aarch64
+      - name: Validate Android deployment plan
+        working-directory: mobile
+        shell: bash
+        run: |
+          PYSIDE_WHEEL="$(find . -type f -iname 'pyside6*.whl' -print -quit)"
+          SHIBOKEN_WHEEL="$(find . -type f -iname 'shiboken6*.whl' -print -quit)"
+          test -n "$PYSIDE_WHEEL"
+          test -n "$SHIBOKEN_WHEEL"
+          pyside6-android-deploy --config-file pysidedeploy.spec \
+            --wheel-pyside="$PYSIDE_WHEEL" --wheel-shiboken="$SHIBOKEN_WHEEL" \
+            --dry-run --force
+
+  ios-deploy-preflight:
+    name: iOS arm64 simulator deployment dry-run
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Qt for Python deploy tools
+        run: python -m pip install PySide6==6.12.0 qtpip
+      - name: Download Qt iOS simulator wheels
+        working-directory: mobile
+        run: |
+          qtpip download PySide6 --ios --arch arm64 --platform simulator
+          qtpip download shiboken6 --ios --arch arm64 --platform simulator
+      - name: Validate iOS deployment plan
+        working-directory: mobile
+        shell: bash
+        run: |
+          PYSIDE_WHEEL="$(find . -type f -iname 'pyside6*.whl' -print -quit)"
+          SHIBOKEN_WHEEL="$(find . -type f -iname 'shiboken6*.whl' -print -quit)"
+          test -n "$PYSIDE_WHEEL"
+          test -n "$SHIBOKEN_WHEEL"
+          pyside6-ios-deploy --config-file pysidedeploy.spec \
+            --wheel-pyside="$PYSIDE_WHEEL" --wheel-shiboken="$SHIBOKEN_WHEEL" \
+            --name MusicVaultMobile --bundle-id com.musicvault.mobile --dry-run

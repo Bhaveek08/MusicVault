@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions
-cd /d "%~dp0"
+cd /d "%~dp0.."
 title Build MusicVault
 
 echo.
@@ -26,7 +26,7 @@ if errorlevel 1 goto :failed
 
 echo.
 echo Running the 50-pass release QA gate...
-python run_release_qa.py
+python scripts\run_release_qa.py
 if errorlevel 1 goto :failed
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0prepare_windows.ps1"
@@ -46,7 +46,7 @@ if exist "dist\MusicVault" rmdir /s /q "dist\MusicVault"
 python -m PyInstaller --noconfirm --clean --onedir --windowed ^
   --name MusicVault ^
   --icon "assets\musicvault.ico" ^
-  --version-file "windows_version_info.txt" ^
+  --version-file "installer\windows_version_info.txt" ^
   --add-data "assets\musicvault-icon.png;assets" ^
   --add-data "assets\musicvault.ico;assets" ^
   --add-binary "vendor\deno.exe;." ^

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
@@ -12,8 +12,8 @@ python3 -m venv .venv-macos
 source .venv-macos/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements-build.txt -r requirements-test.txt
-python run_release_qa.py
-bash ./prepare_macos.sh
+python scripts/run_release_qa.py
+bash "$ROOT/scripts/prepare_macos.sh"
 
 if [[ ! -f assets/musicvault.icns ]]; then
   echo "Missing assets/musicvault.icns" >&2

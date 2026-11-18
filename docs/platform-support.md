@@ -2,38 +2,42 @@
 
 ## Current support matrix
 
-| Platform | Source/runtime status | Installer status | Release status |
+| Platform | UI/runtime status | Package status | Release status |
 | --- | --- | --- | --- |
-| Windows 10/11 x64 | PySide6 desktop client | Inno Setup per-user installer | Build configured; unsigned until code signing is added |
-| macOS Apple Silicon | PySide6 desktop client | `.app` + `.dmg` | Experimental; unsigned and not notarized |
+| Windows 10/11 x64 | PySide6 desktop downloader | Inno Setup per-user installer | Build and packaged smoke test verified in CI; unsigned |
+| macOS Apple Silicon | PySide6 desktop downloader | `.app` + `.dmg` | Build and packaged smoke test verified in CI; unsigned/notarized |
 | macOS Intel | Not packaged | None | Not currently supported as a release artifact |
-| Linux | Python source/testing only | None | No supported installer |
-| Android | No mobile client | None | Planned; not supported |
-| iOS/iPadOS | No mobile client | None | Planned; not supported |
+| Linux | Source/test environment only | None | No native installer |
+| Android | Touch-first UI prototype and host-side tests | Native deploy preflight only; no APK/AAB release | Not supported for media downloads |
+| iOS/iPadOS | Touch-first UI prototype and host-side tests | Native deploy preflight only; no IPA/App Store release | Not supported for media downloads |
 
 ## Desktop distribution
 
-Windows uses a windowed PyInstaller one-folder payload wrapped in an Inno Setup per-user installer. The app installs under the user's local Programs directory; user preferences and logs live in OS-specific app data; downloads are saved to `Music/MusicVault` by default. Uninstall does not delete user downloads.
+Windows uses a windowed PyInstaller one-folder payload wrapped in an Inno Setup per-user installer. The app installs under the user's local Programs directory; preferences and logs live in OS-specific app data; downloads default to `Music/MusicVault`. Uninstall does not delete user downloads.
 
 macOS uses a native `.app` bundle and DMG for Apple Silicon. The build creates an ICNS asset from the high-resolution PNG master. The current pipeline is unsigned and not notarized; public distribution requires Developer ID signing, hardened runtime configuration as appropriate, and Apple notarization.
 
-## Mobile is a separate implementation phase
+## Mobile prototype scope
 
-The desktop codebase is not an Android or iOS build. It uses PySide6 Widgets, Python yt-dlp APIs, FFmpeg, and Deno. Mobile requires a dedicated client and platform-specific storage APIs, permissions, background-task design, architecture-specific dependencies, signing, store-policy review, and testing on physical devices and emulators/simulators.
+The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side Qt tests render at phone-sized dimensions, exercise YouTube/Spotify tab switching, and test basic safe-link acceptance/rejection. Those tests run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
 
-The mobile scope must preserve the same source rules: Spotify links can open in the official app, but Spotify streaming tracks are not exported as local media files. YouTube downloads must respect ownership/permission, applicable platform terms, and access restrictions. A mobile build must not be advertised until its permitted use case and distribution route are validated for each store.
+The mobile UI's preview queue is local UI state only. It does not download media. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
 
-## Release qualification requirements
+- Qt's iOS deploy tool generates an Xcode project using platform-specific PySide6/Shiboken wheels and a Python.xcframework. The tool documentation states that third-party packages are not automatically supported; packages with C extensions need target-specific cross-compilation and app-bundle integration.
+- iOS requires sandbox-compliant file access, native sharing/export handling, app lifecycle/background-task design, privacy-purpose strings, provisioning, and App Store review.
+- Android uses Qt for Python's Android deploy tool, platform-specific wheels, the Android SDK/NDK, and Buildozer. A successful package build still needs emulator/physical-device lifecycle, storage, permission, and network tests.
 
-For every target platform, record the OS version, architecture, runner/device type, build identifier, test run ID, and exact pass/fail count. The 50-pass desktop QA command verifies repeated regression runs on the host where it executes. It is not a substitute for mobile application tests or real-device validation.
+The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
-Before Android or iOS can be called supported, the project needs:
+## Mobile release gates
 
-1. A dedicated mobile client and accessibility review.
-2. Platform-specific file APIs and lifecycle/background-download design.
-3. Dependency provenance, signing, permissions, and privacy disclosures.
-4. Emulator/simulator automation plus physical-device tests.
-5. Store-policy and distribution review.
-6. At least 50 independent regression runs on each platform runner, plus device-specific scenarios and media-file integrity checks.
+Before Android or iOS can be called supported:
 
-A successful Android test run does not count as iOS coverage, and vice versa.
+1. Finish the platform-specific media pipeline, including FFmpeg conversion and a JavaScript challenge runtime where required, without attempting to run arbitrary external executables on iOS.
+2. Add app-sandbox file pickers/export flows and platform-specific storage permissions.
+3. Implement download lifecycle, resume/cancel semantics, battery/network constraints, and background behaviour.
+4. Generate native APK/AAB and iOS simulator/device builds using the official Qt toolchains.
+5. Add simulator/emulator tests and physical-device tests for app lifecycle, permission denial, storage exhaustion, network interruption, cancellation, and output-file integrity.
+6. Complete signing, privacy disclosures, licensing/third-party notices, and store-policy review.
+
+Android and iOS require separate test evidence. Host-side UI tests and deployment dry-runs are preflight checks only; they are not evidence that downloads run correctly on a real phone.

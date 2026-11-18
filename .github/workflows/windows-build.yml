@@ -3,7 +3,6 @@ name: Windows build
 on:
   workflow_dispatch:
   push:
-    branches: [main]
     tags:
       - "v*"
 
@@ -29,8 +28,8 @@ jobs:
         shell: cmd
         run: |
           set CI=1
-          build_windows.bat
-      - name: Upload executable and notices
+          scripts\build_windows.bat
+      - name: Upload installer and notices
         uses: actions/upload-artifact@v4
         with:
           name: musicvault-windows-x64

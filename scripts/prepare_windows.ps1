@@ -3,8 +3,9 @@ $Version = '2.9.8'
 $Asset = 'deno-x86_64-pc-windows-msvc.zip'
 $ExpectedSha256 = 'cba84b26e0df5ae7f74fc66b86a95b866872a86292ebd84fa1e959927edd93bf'
 $Base = "https://github.com/denoland/deno/releases/download/v$Version/$Asset"
-$Vendor = Join-Path $PSScriptRoot 'vendor'
-$Temp = Join-Path $PSScriptRoot '.build-deno'
+$Root = Split-Path -Parent $PSScriptRoot
+$Vendor = Join-Path $Root 'vendor'
+$Temp = Join-Path $Root '.build-deno'
 $Zip = Join-Path $Temp $Asset
 
 New-Item -ItemType Directory -Force -Path $Vendor, $Temp | Out-Null

@@ -22,7 +22,7 @@ jobs:
           python-version: "3.11"
           architecture: arm64
       - name: Build app bundle and disk image
-        run: bash ./build_macos.sh
+        run: bash ./scripts/build_macos.sh
       - name: Upload macOS installer
         uses: actions/upload-artifact@v4
         with:

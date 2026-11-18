@@ -1,14 +1,14 @@
 # Release process
 
-A source-level test pass is necessary but not sufficient for a desktop release.
+A source-level test pass is necessary but not sufficient for a desktop or mobile release.
 
 ## Before tagging
 
 - [ ] Review the diff and update `CHANGELOG.md`.
 - [ ] Update `APP_VERSION`, `pyproject.toml`, Windows version metadata, and `installer/MusicVault.iss`.
 - [ ] Review pinned runtime/build dependencies and upstream notices.
-- [ ] Run `python -m pytest -q` and `python run_release_qa.py`.
-- [ ] Run the deterministic URL fuzz suite and review `QA_REPORT.md`.
+- [ ] Run `python -m pytest -q` and `python scripts/run_release_qa.py`.
+- [ ] Review the deterministic URL validation suite and update `QA_REPORT.md`.
 - [ ] Check that build outputs, virtual environments, caches, local configuration, and secrets are absent from the repository.
 
 ## Windows release validation
@@ -16,7 +16,7 @@ A source-level test pass is necessary but not sufficient for a desktop release.
 On a clean Windows 10/11 x64 machine:
 
 - [ ] Install Python 3.11+ and Inno Setup 6.
-- [ ] Run `build_windows.bat` from a clean checkout.
+- [ ] Run `scripts/build_windows.bat` from a clean checkout.
 - [ ] Confirm the Deno checksum verification succeeds.
 - [ ] Confirm the PyInstaller one-folder/windowed build and packaged smoke test pass.
 - [ ] Confirm `MusicVault-Setup.exe` compiles and installs without a console window.
@@ -31,14 +31,22 @@ On a clean Windows 10/11 x64 machine:
 
 On a clean Apple Silicon Mac:
 
-- [ ] Run `build_macos.sh`.
+- [ ] Run `bash scripts/build_macos.sh`.
 - [ ] Open the `.app` from the DMG and move it to Applications.
 - [ ] Test on a fresh standard user account.
 - [ ] Verify the app starts without Terminal, persists preferences under Application Support, and writes downloads only to the selected folder.
 - [ ] Test screen sizes, app icon, Finder/Spotlight integration, and uninstallation by removing the app bundle.
 - [ ] Verify the code-signing and notarization status before public distribution.
 
-Intel Mac, Linux packaged, Android, and iOS releases remain unsupported until separate builds and tests are added.
+## Android/iOS release validation
+
+The mobile UI prototype is not a downloader release. Do not distribute it as a functional media downloader. Before any mobile release:
+
+- [ ] Complete the platform-specific media pipeline, sandbox storage integration, and background lifecycle.
+- [ ] Build and run Android APK/AAB on an emulator and physical device.
+- [ ] Build and run iOS simulator and signed device builds using Xcode.
+- [ ] Exercise permission grants/denials, offline/weak network, storage exhaustion, suspend/resume, cancellation, and output integrity.
+- [ ] Review platform-specific privacy disclosures, signing/provisioning, and app store policies.
 
 ## Publishing
 

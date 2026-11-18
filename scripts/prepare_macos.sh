@@ -4,7 +4,7 @@ set -euo pipefail
 VERSION="2.9.8"
 ASSET="deno-aarch64-apple-darwin.zip"
 EXPECTED_SHA256="9f0bf660393da2eaff044cdc7444cb08c73f235849b61d224d825a194ce7c98e"
-ROOT="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VENDOR="$ROOT/vendor"
 TEMP="$ROOT/.build-deno-macos"
 
