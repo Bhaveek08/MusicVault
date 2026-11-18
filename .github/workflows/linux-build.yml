@@ -8,6 +8,8 @@ on:
       - "scripts/build_linux.sh"
       - ".github/workflows/linux-build.yml"
       - "requirements*.txt"
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
   pull_request:
     paths:
       - "musicvault_*.py"
