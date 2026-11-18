@@ -9,11 +9,13 @@ import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import androidx.webkit.WebViewAssetLoader;
 import android.webkit.WebResourceRequest;
+import android.webkit.ConsoleMessage;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 import android.webkit.WebResourceResponse;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -62,7 +64,15 @@ public final class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSupportMultipleWindows(false);
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage message) {
+                if (BuildConfig.DEBUG) {
+                    Log.w("MusicVaultWeb", message.message() + " (" + message.sourceId() + ":" + message.lineNumber() + ")");
+                }
+                return true;
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -75,6 +85,30 @@ public final class MainActivity extends Activity {
                 }
                 return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked",
                     Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        android.webkit.WebResourceError error) {
+                if (BuildConfig.DEBUG && request.isForMainFrame()) {
+                    Log.e("MusicVaultWeb", "Page load failed: " + request.getUrl() + " — " + error.getDescription());
+                }
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request,
+                                            WebResourceResponse response) {
+                if (BuildConfig.DEBUG && request.isForMainFrame()) {
+                    Log.e("MusicVaultWeb", "HTTP " + response.getStatusCode() + " for " + request.getUrl());
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (BuildConfig.DEBUG) {
+                    view.evaluateJavascript("document.body ? document.body.innerText.slice(0, 200) : 'missing body'",
+                        result -> Log.i("MusicVaultWeb", "Rendered page text: " + result));
+                }
             }
 
             @Override
