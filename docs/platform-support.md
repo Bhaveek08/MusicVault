@@ -8,8 +8,8 @@
 | macOS Apple Silicon | PySide6 desktop downloader | `.app` + `.dmg` | Build and packaged smoke test verified in CI; unsigned/notarized |
 | macOS Intel | Not packaged | None | Not currently supported as a release artifact |
 | Linux | Source/test environment only | None | No native installer |
-| Android | Touch-first UI prototype and host-side tests | Native deploy preflight only; no APK/AAB release | Not supported for media downloads |
-| iOS/iPadOS | Touch-first UI prototype and host-side tests | Native deploy preflight only; no IPA/App Store release | Not supported for media downloads |
+| Android | Touch-first UI prototype; phone-sized Qt UI tests on desktop runners | No APK/AAB; Qt Android deploy tool is blocked by its commercial-license credential gate in CI | Not supported |
+| iOS/iPadOS | Touch-first UI prototype; phone-sized Qt UI tests and host Xcode/Simulator SDK check | No IPA or simulator app; target PySide6/Shiboken wheels and signing are not provisioned | Not supported |
 
 ## Desktop distribution
 
@@ -19,13 +19,13 @@ macOS uses a native `.app` bundle and DMG for Apple Silicon. The build creates a
 
 ## Mobile prototype scope
 
-The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side tests cover YouTube/Spotify URL validation and static UI structure checks. They do not instantiate or render the Qt Widgets UI because Qt 6.12's offscreen backend crashed at shutdown on the available CI runners. These tests run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
+The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side tests instantiate the Qt Widgets window at a phone-sized viewport, switch source tabs, exercise the permission/playlist preview queue, and check YouTube/Spotify URL validation. The Qt offscreen renderer is also used to capture review screenshots. These checks run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
 
 The mobile UI's preview queue is local UI state only. It does not download media. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
 
 - Qt's iOS deploy tool generates an Xcode project using platform-specific PySide6/Shiboken wheels and a Python.xcframework. The tool documentation states that third-party packages are not automatically supported; packages with C extensions need target-specific cross-compilation and app-bundle integration.
 - iOS requires sandbox-compliant file access, native sharing/export handling, app lifecycle/background-task design, privacy-purpose strings, provisioning, and App Store review.
-- Android's arm64 PySide6/Shiboken wheels can be fetched with qtpip. The deploy attempt was blocked by the Qt deploy tool's license-credential gate in CI, so no APK/AAB has been created. A package build still needs Android SDK/NDK setup plus emulator/physical-device lifecycle, storage, permission, and network tests.
+- The Android deploy attempt reached Qt's target-wheel download step but stopped at the Qt deploy tool's commercial-license credential gate on the public runner. The CI job records this as a known blocker; no APK/AAB or target wheel package is claimed. A package build needs licensed deployment credentials, Android SDK/NDK setup, and emulator/physical-device lifecycle, storage, permission, and network tests.
 
 The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
@@ -40,4 +40,4 @@ Before Android or iOS can be called supported:
 5. Add simulator/emulator tests and physical-device tests for app lifecycle, permission denial, storage exhaustion, network interruption, cancellation, and output-file integrity.
 6. Complete signing, privacy disclosures, licensing/third-party notices, and store-policy review.
 
-Android and iOS require separate test evidence. Host-side UI tests and deployment dry-runs are preflight checks only; they are not evidence that downloads run correctly on a real phone.
+Android and iOS require separate test evidence. Host-side phone-sized UI tests and deployment-readiness checks are preflight only; they are not evidence that downloads run correctly on a real phone. Review PNG screenshots from the `musicvault-ui-previews` artifact in the Mobile UI workflow.
