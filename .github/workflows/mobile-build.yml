@@ -56,11 +56,14 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          target: google_apis
+          target: default
           arch: x86_64
           profile: pixel_2
+          emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim -camera-back none
+          # Keep CPU virtualization but force SwiftShader rendering. Hardware GPU
+          # rendering has caused ColorBuffer/ADB broken-pipe failures on hosted CI.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
             adb logcat -c
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
