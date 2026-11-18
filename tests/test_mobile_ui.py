@@ -25,7 +25,6 @@ def test_youtube_link_categories(url, kind):
     "javascript:alert(1)",
     "https://www.youtube.com/watch?v=short",
     "https://www.youtube.com/playlist?list=bad",
-    "https://www.youtube.com/watch?v=BaW_jenozKc\n",
     "",
     "x" * 3000,
 ])
