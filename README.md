@@ -56,7 +56,7 @@ Use the Windows installer from a trusted project release or the [Windows build w
 
 The installer is not code-signed; Windows may show an unknown-publisher warning until signing is configured.
 
-Pushing a version tag such as `v2.0.1` runs the Windows release workflow and publishes both `MusicVault-Setup.exe` and `MusicVault-Windows-x64.zip` on the GitHub Releases page. Releases remain unsigned until code signing is configured.
+Pushing a new version tag (`vX.Y.Z`) runs the Windows release workflow and publishes both `MusicVault-Setup.exe` and `MusicVault-Windows-x64.zip` on the GitHub Releases page. Releases remain unsigned until code signing is configured.
 
 ### Linux x86_64
 
