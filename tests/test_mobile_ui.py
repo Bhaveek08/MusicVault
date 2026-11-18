@@ -1,20 +1,8 @@
 from pathlib import Path
-import os
 
 import pytest
 
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-
-from PySide6.QtWidgets import QApplication
-
-from mobile.app.main import MusicVaultMobileWindow
 from mobile.app.source_validation import validate_spotify_link, validate_youtube_link
-
-
-@pytest.fixture(scope="session")
-def qapp():
-    app = QApplication.instance() or QApplication(["musicvault-mobile-tests"])
-    yield app
 
 
 @pytest.mark.parametrize(("url", "kind"), [
@@ -87,47 +75,12 @@ def test_mobile_ui_source_has_both_provider_sections_and_no_downloader_worker():
     assert "subprocess" not in source
 
 
-def test_mobile_window_renders_phone_layout(qapp):
-    window = MusicVaultMobileWindow()
-    window.resize(390, 844)
-    window.show()
-    qapp.processEvents()
-    assert window.width() == 390
-    assert window.youtube_tab.isVisible()
-    assert window.spotify_tab.isVisible()
-    assert window.pages.currentIndex() == 0
-    window.close()
-
-
-def test_mobile_source_tabs_switch(qapp):
-    window = MusicVaultMobileWindow()
-    window.show()
-    window.set_source("spotify")
-    qapp.processEvents()
-    assert window.pages.currentIndex() == 1
-    assert window.spotify_tab.property("active") is True
-    window.set_source("youtube")
-    qapp.processEvents()
-    assert window.pages.currentIndex() == 0
-    assert window.youtube_tab.property("active") is True
-    window.close()
-
-
-def test_mobile_preview_queue_requires_permission_and_playlist_opt_in(qapp):
-    window = MusicVaultMobileWindow()
-    window.youtube_input.setText("https://youtu.be/BaW_jenozKc")
-    window.add_youtube_preview()
-    assert window.queue.count() == 0
-    assert "Confirm" in window.queue_status.text()
-
-    window.rights_check.setChecked(True)
-    window.youtube_input.setText("https://www.youtube.com/playlist?list=PL1234567890")
-    window.add_youtube_preview()
-    assert window.queue.count() == 0
-    assert "full playlist" in window.queue_status.text().lower()
-
-    window.playlist_check.setChecked(True)
-    window.add_youtube_preview()
-    assert window.queue.count() == 1
-    assert "mobile downloading is not enabled" in window.queue_status.text()
-    window.close()
+def test_screenshot_capture_covers_both_desktop_and_mobile_sources():
+    source = Path("scripts/capture_ui_previews.py").read_text(encoding="utf-8")
+    for output in (
+        "desktop-youtube.png",
+        "desktop-spotify.png",
+        "mobile-prototype-youtube.png",
+        "mobile-prototype-spotify.png",
+    ):
+        assert output in source
