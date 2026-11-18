@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import argparse
-import os
+import sys
 from pathlib import Path
 
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QColor, QPainter, QPixmap
@@ -42,7 +44,7 @@ def render(widget, output: Path, size: QSize, *, desktop_tab: int | None = None,
 
 
 def main() -> int:
-    if sys.platform.startswith("linux") and not os.environ.get("DISPLAY"):
+    if sys.platform.startswith("linux") and not __import__("os").environ.get("DISPLAY"):
         raise RuntimeError("On Linux, run screenshot capture inside Xvfb (xvfb-run -a).")
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("artifacts/ui-preview"))
