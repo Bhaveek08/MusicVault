@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.webkit.SafeBrowsingResponse;
 import android.webkit.WebChromeClient;
+import androidx.webkit.WebViewAssetLoader;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -25,6 +25,7 @@ public final class MainActivity extends Activity {
     ));
 
     private WebView webView;
+    private WebViewAssetLoader assetLoader;
 
     static boolean isAllowedSpotifyUri(Uri uri) {
         if (uri == null || !"https".equalsIgnoreCase(uri.getScheme())) return false;
@@ -42,12 +43,16 @@ public final class MainActivity extends Activity {
         getWindow().setNavigationBarColor(Color.rgb(8, 9, 11));
         getWindow().getDecorView().setSystemUiVisibility(0);
 
+        assetLoader = new WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+            .build();
+
         webView = new WebView(this);
         webView.setBackgroundColor(Color.rgb(8, 9, 11));
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(false);
-        settings.setAllowFileAccess(true);
+        settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
@@ -57,9 +62,16 @@ public final class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                if ("file".equalsIgnoreCase(uri.getScheme())) return false;
+                if ("https".equalsIgnoreCase(uri.getScheme())
+                    && "appassets.androidplatform.net".equalsIgnoreCase(uri.getHost())
+                    && uri.getPath() != null && uri.getPath().startsWith("/assets/")) return false;
                 if (isAllowedSpotifyUri(uri)) {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -71,14 +83,9 @@ public final class MainActivity extends Activity {
                 return true;
             }
 
-            @Override
-            public void onSafeBrowsingHit(WebView view, WebResourceRequest request,
-                                          int threatType, SafeBrowsingResponse callback) {
-                callback.backToSafety(true);
-            }
         });
         setContentView(webView);
-        webView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
     @Override
