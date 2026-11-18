@@ -49,3 +49,10 @@ Open the latest [Mobile UI workflow run](https://github.com/Bhaveek08/MusicVault
 
 - **Android:** the CI attempt to obtain Qt Android target wheels reached a commercial-license credential gate. No native APK/AAB is generated. The workflow reports this blocker without marking host-side UI tests as failed.
 - **iOS:** the CI runner verifies Xcode and the iOS Simulator SDK, but matching target PySide6/Shiboken wheels, app signing and a simulator app build are not yet configured.
+
+## Native test builds
+
+- **Android:** open the android/ folder as a Gradle project in Android Studio, or download the latest `MusicVault-Android-test-build` artifact from [Mobile native builds](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile-build.yml). Install the `MusicVault-Android-debug.apk` on Android 9 or later. This is an unsigned debug APK for testing, not a Play Store release.
+- **iOS:** open `ios/MusicVault.xcodeproj` in Xcode and run the `MusicVault` scheme on an iOS 16+ simulator. The workflow artifact contains a simulator app archive and a standalone Xcode project source bundle. For a real iPhone/iPad, select your Apple Developer Team in Xcode and build/sign locally; the simulator archive is not a device IPA.
+
+Both clients use the same local HTML/CSS/JS UI. They only allow external navigation to official Spotify HTTPS links. Neither client has the yt-dlp/FFmpeg download engine connected.
