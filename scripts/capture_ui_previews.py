@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -65,8 +66,12 @@ def main() -> int:
     mobile_spotify = MusicVaultMobileWindow()
     render(mobile_spotify, args.output / "mobile-prototype-spotify.png", QSize(390, 844), mobile_source="spotify")
 
-    print(f"Captured 4 UI previews in {args.output}")
-    return 0
+    print(f"Captured 4 UI previews in {args.output}", flush=True)
+    # PySide6 6.12 can SIGBUS during process teardown under hosted Xvfb after
+    # the PNGs have been saved. This helper is a one-shot CI process, so skip
+    # Qt's unstable global teardown only after every screenshot write succeeded.
+    sys.stdout.flush()
+    os._exit(0)
 
 
 if __name__ == "__main__":
