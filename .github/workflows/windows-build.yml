@@ -2,6 +2,17 @@ name: Windows build
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish the Windows installer as a GitHub Release
+        required: true
+        type: boolean
+        default: false
+      release_version:
+        description: Version tag to create (for example v2.0.1)
+        required: false
+        type: string
+        default: v2.0.1
   pull_request:
     paths:
       - ".github/workflows/windows-build.yml"
@@ -65,7 +76,7 @@ jobs:
   release:
     name: Publish tagged Windows release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
     runs-on: windows-latest
     permissions:
       contents: write
@@ -79,12 +90,34 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
         run: |
-          $tag = $env:GITHUB_REF_NAME
           $assets = @(
             'release-assets/dist/MusicVault-Setup.exe',
             'release-assets/dist/MusicVault-Windows-x64.zip',
             'release-assets/THIRD_PARTY_NOTICES.txt',
             'release-assets/QA_REPORT.md'
           )
-          gh release create $tag $assets --title "MusicVault $tag" --generate-notes --verify-tag
+          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
+            $tag = $env:RELEASE_VERSION
+            $validTag = $tag.StartsWith('v')
+            $versionParts = @()
+            if ($validTag) {
+              $versionParts = $tag.Substring(1).Split('.')
+              $validTag = $versionParts.Length -eq 3
+            }
+            if ($validTag) {
+              foreach ($part in $versionParts) {
+                if ($part.Length -eq 0 -or $part -match '[^0-9]') {
+                  $validTag = $false
+                }
+              }
+            }
+            if (-not $validTag) {
+              throw "Release version must use the vX.Y.Z format."
+            }
+            gh release create $tag $assets --title "MusicVault $tag" --generate-notes --target $env:GITHUB_SHA
+          } else {
+            $tag = $env:GITHUB_REF_NAME
+            gh release create $tag $assets --title "MusicVault $tag" --generate-notes --verify-tag
+          }
