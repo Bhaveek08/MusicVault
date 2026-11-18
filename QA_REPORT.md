@@ -42,8 +42,8 @@ Both platform-specific GitHub Actions packaging jobs completed successfully for 
 
 | Platform | Result | Artifact |
 | --- | --- | --- |
-| Windows x64 | <badge>Build + packaged smoke test passed</badge> | [Download Windows build](https://github.com/Bhaveek08/MusicVault/actions/runs/44306071742/artifacts/14429435283) |
-| macOS 15 / Apple Silicon | <badge>Build + packaged smoke test passed</badge> | [Download macOS DMG](https://github.com/Bhaveek08/MusicVault/actions/runs/44306072060/artifacts/14429270149) |
+| Windows x64 | Passed — build and packaged smoke test | [Download Windows build](https://github.com/Bhaveek08/MusicVault/actions/runs/44306071742/artifacts/14429435283) |
+| macOS 15 / Apple Silicon | Passed — build and packaged smoke test | [Download macOS DMG](https://github.com/Bhaveek08/MusicVault/actions/runs/44306072060/artifacts/14429270149) |
 
 The Windows workflow built a windowed PyInstaller payload, ran the packaged executable with `--smoke-test`, compiled the per-user Inno Setup installer, and uploaded the installer plus payload. The macOS workflow built the Apple Silicon `.app`, ran the packaged offscreen smoke test, created a DMG, and uploaded it.
 
