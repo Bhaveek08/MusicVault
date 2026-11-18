@@ -53,7 +53,7 @@ The mobile images are touch-first layouts rendered at 390 × 844. Native Android
 2. Open it and follow the per-user setup. The installer does not require administrator access.
 3. Launch MusicVault from the Start menu.
 
-If Windows shows an unknown-publisher message, the current installer is unsigned; only download it from this repository. If a release is not published yet, the [Windows build workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/windows-build.yml) is the temporary fallback.
+If Windows shows an unknown-publisher message, the current installer is unsigned; only download it from this repository. If a release is not published yet, the [Windows build workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/windows-build.yml) is the temporary fallback. New version tags automatically publish the installer and portable ZIP to [GitHub Releases](https://github.com/Bhaveek08/MusicVault/releases); the download button above always points to the latest installer.
 
 The installer is configured to:
 
