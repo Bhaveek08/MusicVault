@@ -65,6 +65,6 @@ For a physical iPhone/iPad, connect the device, choose your Apple Developer Team
 
 ## End-to-end verification
 
-The native workflow builds the Android debug APK, installs it on an Android 15 emulator, waits for a native WebView readiness signal emitted only after the shared JavaScript initializes and the expected controls/theme are present, and then saves a screenshot. It separately builds the iOS Simulator app, installs it on an iPhone simulator, launches it, and saves a screenshot.
+The native workflow builds the Android debug APK, installs it on an Android emulator, forces SwiftShader software rendering for the hosted emulator, waits for a native WebView readiness signal emitted only after the shared JavaScript initializes and the expected controls/theme are present, and then saves a screenshot. It separately builds the iOS Simulator app, installs it on an iPhone simulator, launches it, and saves a screenshot.
 
 A successful emulator/simulator run verifies the app shell and shared UI—not physical-device behaviour, store signing or media downloading. Test on your actual devices before release.
