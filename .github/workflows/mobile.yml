@@ -6,11 +6,13 @@ on:
     paths:
       - "mobile/**"
       - "tests/test_mobile_ui.py"
+      - "scripts/capture_ui_previews.py"
       - ".github/workflows/mobile.yml"
   pull_request:
     paths:
       - "mobile/**"
       - "tests/test_mobile_ui.py"
+      - "scripts/capture_ui_previews.py"
       - ".github/workflows/mobile.yml"
   workflow_dispatch:
 
@@ -19,7 +21,7 @@ permissions:
 
 jobs:
   mobile-ui:
-    name: Mobile UI policy tests (${{ matrix.os }})
+    name: Mobile UI tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -37,65 +39,54 @@ jobs:
           sudo apt-get install -y libegl1 libgl1 libxkbcommon0
       - name: Install UI test dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Test mobile URL policy and UI structure
+      - name: Test mobile URL policy and phone-sized UI
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest -q tests/test_mobile_ui.py
+      - name: Capture desktop and mobile UI previews
+        if: runner.os == 'Linux'
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python scripts/capture_ui_previews.py --output artifacts/ui-preview
+      - name: Upload UI preview images
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: musicvault-ui-previews
+          path: artifacts/ui-preview/*.png
+          if-no-files-found: error
+          retention-days: 30
 
-  android-deploy-preflight:
-    name: Android deploy attempt (license-gated)
+  android-target-readiness:
+    name: Android deployment prerequisites
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install Linux Qt runtime libraries
+      - name: Record the current build blocker
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libdouble-conversion3
-      - name: Install Qt for Python deploy tools
-        run: python -m pip install PySide6==6.12.0 qtpip
-      - name: Attempt Android target wheel download
-        id: android_wheels
-        working-directory: mobile
-        continue-on-error: true
-        run: |
-          qtpip download PySide6 --android --arch aarch64
-          qtpip download shiboken6 --android --arch aarch64
-      - name: Report Android deployment status
-        if: always()
-        env:
-          ANDROID_WHEEL_RESULT: ${{ steps.android_wheels.outcome }}
-        run: |
-          if [ "$ANDROID_WHEEL_RESULT" = "success" ]; then
-            echo "Android target wheels were retrieved."
-            echo "No APK/AAB was built in this workflow."
-          else
-            echo "::warning::Android wheel/deploy preflight is blocked by Qt deployment licensing/toolchain configuration. No APK/AAB was built."
-          fi
+          echo "::warning::Qt for Python Android target wheel deployment currently requires Qt commercial-license credentials on the public runner. No APK/AAB build or Android device test is being claimed."
+          echo "Android UI is exercised by the phone-sized desktop-host tests above."
+          echo "A native Android build remains blocked pending a licensed Qt deployment toolchain."
 
   ios-toolchain-check:
-    name: iOS deployment toolchain check
+    name: iOS toolchain readiness
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Verify Xcode and iOS SDK are available
+      - name: Verify Xcode and iOS Simulator SDK
         run: |
           xcodebuild -version
           xcrun --sdk iphonesimulator --show-sdk-version
-      - name: Install open-source Qt for Python host wheels
-        run: python -m pip install PySide6==6.12.0
+      - name: Install host Qt for Python wheels
+        run: python -m pip install -r requirements-test.txt
       - name: Verify shared mobile validation and UI imports
-        working-directory: .
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -c "from mobile.app.source_validation import validate_youtube_link; from mobile.app.main import MusicVaultMobileWindow; assert validate_youtube_link('https://youtu.be/BaW_jenozKc') == 'video'; print(MusicVaultMobileWindow.__name__)"
+        run: |
+          python -c "from mobile.app.source_validation import validate_youtube_link; from mobile.app.main import MusicVaultMobileWindow; assert validate_youtube_link('https://youtu.be/BaW_jenozKc') == 'video'; print(MusicVaultMobileWindow.__name__)"
       - name: Record iOS deployment boundary
         run: |
-          echo "Xcode and iOS Simulator SDK are present."
-          echo "No iOS target wheel/Xcode project/IPA is built in this workflow."
-          echo "The desktop media pipeline still needs a separate mobile-native port."
+          echo "::warning::Host Xcode/Simulator SDK is available, but target-specific PySide6/Shiboken6 iOS wheels and signing are not provisioned. No IPA or simulator app build is being claimed."
+          echo "iOS UI is exercised by host-side phone-sized Qt tests; simulator/device validation remains pending."
