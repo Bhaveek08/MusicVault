@@ -17,7 +17,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 APP_NAME = "MusicVault"
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.0.2"
 MAX_URL_LENGTH = 2048
 MAX_PLAYLIST_ITEMS = 500
 MAX_QUEUE_ITEMS = 100

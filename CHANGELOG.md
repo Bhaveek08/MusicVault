@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 — 2026-11-19
+
+- Align the app, Windows installer, package metadata, and release version.
+- Add desktop Qt interaction and window-bound regression tests.
+- Clarify current platform packaging and QA evidence.
+
 ## Unreleased
 
 - Added a touch-first Android/iOS UI prototype with safe YouTube/Spotify link validation; media downloading is intentionally not enabled in the mobile shell.
@@ -14,7 +20,7 @@
 - Added lightweight event-driven button hover/press feedback and a short source-tab transition.
 - Created a monochrome vault-and-waveform icon set for the app.
 - Changed the release QA gate to 50 complete runs on the host that executes it; the report now states the host limitation.
-- Kept Android and iOS explicitly marked as planned because no mobile app clients exist yet.
+- Added only prototype mobile UI shells; native downloads and production mobile releases remain unsupported.
 
 ## 1.3.0 — 2026-11-18
 

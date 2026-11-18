@@ -1,8 +1,8 @@
-# MusicVault 2.0.1 — QA report
+# MusicVault 2.0.2 — QA report
 
 ## Release artifacts
 
-The public [v2.0.1 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.1) contains:
+The public [v2.0.2 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.2) contains:
 
 | Platform | Asset | Verification | Distribution caveat |
 | --- | --- | --- | --- |
