@@ -1,0 +1,101 @@
+name: Mobile native builds
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
+  pull_request:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android APK + emulator smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android SDK packages
+        uses: android-actions/setup-android@v3
+      - name: Install Android 35 platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+      - name: Install Gradle 8.9
+        run: |
+          curl -fsSL https://services.gradle.org/distributions/gradle-8.9-bin.zip -o "$RUNNER_TEMP/gradle.zip"
+          unzip -q "$RUNNER_TEMP/gradle.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.9/bin" >> "$GITHUB_PATH"
+      - name: Build debug APK
+        working-directory: mobile/android
+        run: gradle --no-daemon --stacktrace assembleDebug
+      - name: Run APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n com.musicvault.mobile/.MainActivity
+            sleep 8
+            adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
+            mkdir -p artifacts
+            adb exec-out screencap -p > artifacts/android-emulator.png
+      - name: Prepare Android source bundle
+        run: |
+          mkdir -p dist
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk dist/MusicVault-Android-debug.apk
+          zip -qr dist/MusicVault-Android-source.zip mobile/android mobile/shared
+          cp artifacts/android-emulator.png dist/
+      - name: Upload Android test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicVault-Android-test-build
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+  ios:
+    name: iOS Simulator app + Xcode source bundle
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Xcode
+        run: xcodebuild -version
+      - name: Build iOS Simulator app
+        run: |
+          xcodebuild             -project mobile/ios/MusicVault.xcodeproj             -scheme MusicVault             -sdk iphonesimulator             -destination 'generic/platform=iOS Simulator'             -derivedDataPath "$RUNNER_TEMP/MusicVault-iOS"             CODE_SIGNING_ALLOWED=NO             build
+      - name: Install and launch on an iOS Simulator
+        run: |
+          DEVICE_ID="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for group in d["devices"].values() for x in group if x.get("isAvailable") and x["name"].startswith("iPhone")) )')"
+          APP_PATH="$RUNNER_TEMP/MusicVault-iOS/Build/Products/Debug-iphonesimulator/MusicVault.app"
+          xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+          xcrun simctl install "$DEVICE_ID" "$APP_PATH"
+          xcrun simctl launch "$DEVICE_ID" com.musicvault.mobile
+          sleep 5
+          mkdir -p dist
+          xcrun simctl io "$DEVICE_ID" screenshot dist/ios-simulator.png
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" dist/MusicVault-iOS-Simulator.app.zip
+      - name: Prepare iOS Xcode source bundle
+        run: |
+          zip -qr dist/MusicVault-iOS-Xcode-project.zip mobile/ios/MusicVault.xcodeproj mobile/ios/MusicVault mobile/shared
+      - name: Upload iOS test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicVault-iOS-test-build
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
