@@ -21,7 +21,7 @@ macOS uses a native `.app` bundle and DMG for Apple Silicon. The build creates a
 
 The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side tests instantiate the Qt Widgets window at a phone-sized viewport, switch source tabs, exercise the permission/playlist preview queue, and check YouTube/Spotify URL validation. The Qt offscreen renderer is also used to capture review screenshots. These checks run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
 
-The mobile UI's preview queue is local UI state only. It does not download media. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
+The mobile UI's preview queue is local UI state only. It does not download media. Automated source and URL-policy tests run on Ubuntu and Windows desktop hosts. Real widget screenshots are rendered under Xvfb in the Mobile UI workflow; the Linux Qt offscreen plugin crashed on the hosted runners and is intentionally not used. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
 
 - Qt's iOS deploy tool generates an Xcode project using platform-specific PySide6/Shiboken wheels and a Python.xcframework. The tool documentation states that third-party packages are not automatically supported; packages with C extensions need target-specific cross-compilation and app-bundle integration.
 - iOS requires sandbox-compliant file access, native sharing/export handling, app lifecycle/background-task design, privacy-purpose strings, provisioning, and App Store review.
