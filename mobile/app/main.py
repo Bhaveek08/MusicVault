@@ -304,7 +304,7 @@ class MusicVaultMobileWindow(QWidget):
             QCheckBox::indicator:unchecked { background:#0F1217; border:1px solid #718092; border-radius:6px; }
             QCheckBox::indicator:checked { background:#D0DBEA; border:1px solid #D0DBEA; border-radius:6px; }
             QPushButton { min-height:46px; border-radius:11px; font-size:14px; font-weight:700; padding:9px 14px; }
-            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }
+            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }\n            QPushButton#YoutubeButton:focus, QPushButton#SpotifyButton:focus, QPushButton#SecondaryButton:focus,\n            QPushButton#StopButton:focus, QPushButton#TextButton:focus, QPushButton#YoutubeTab:focus,\n            QPushButton#SpotifyTab:focus { border:2px solid #F4F6F8; }
             QPushButton#YoutubeTab, QPushButton#SpotifyTab {
                 background:#191E26; color:#C0C8D2; border:1px solid #3A4553;
             }
