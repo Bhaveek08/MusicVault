@@ -1,55 +1,58 @@
-# MusicVault 2.0.0 — Release QA report
+# MusicVault 2.0.0 — QA report
 
-## Summary
+## Automated test matrix
 
-- Host: Linux x86_64 sandbox (glibc 2.41)
-- Python: 3.13.5
-- FFmpeg: 7.1.5
-- Consecutive full-suite runs: **50/50**
-- Tests per run: **110/110**
-- Total passing test executions: **5,500**
-- Failed runs: **0**
-- Result: **PASS for Linux source and local media regression checks**
+The GitHub Actions CI workflow completed successfully for commit `a7be99f9a75fa5a9d99132a8db13fa2c726d1337` on all six combinations:
 
-## Coverage
+| Runner | Python | Result |
+| --- | --- | --- |
+| Ubuntu latest | 3.11 | Passed |
+| Ubuntu latest | 3.13 | Passed |
+| Windows latest | 3.11 | Passed |
+| Windows latest | 3.13 | Passed |
+| macOS 15 (Apple Silicon) | 3.11 | Passed |
+| macOS 15 (Apple Silicon) | 3.13 | Passed |
 
-The 110-test suite covers:
+Each job runs `run_release_qa.py`, which repeats the same pytest suite 50 times and stops on the first failure. The current suite contains **33 pytest cases** (including parameterized cases).
 
-1. URL allowlists, canonicalization, query parsing, malformed-link rejection and generated URL fuzz inputs.
-2. Spotify official-host validation and non-exporting Spotify hand-off.
-3. Playlist-only links and the 500-item playlist cap.
-4. Queue limits and guarded queue state transitions.
-5. Output-folder creation, resolution, permissions and cleanup.
-6. Safe output templates, Windows-compatible filenames and collision handling.
-7. Best-available source audio selection and 320 kbps targets for lossy exports.
-8. WAV/FLAC paths without lossy bitrate caps.
-9. MKV audio/video merge and remux option mapping.
-10. Downloader isolation: no browser cookies, credentials or plugins.
-11. Bundled FFmpeg/Deno path containment and missing-runtime behaviour.
-12. Log redaction for URLs, authorization values, cookies and tokens.
-13. Progress formatting for normal and invalid numeric values.
-14. Static Windows installer flags, app metadata, icons and console suppression.
-15. Worker-thread lifecycle, cancellation and shutdown guards.
-16. Local FFmpeg encode/decode round trips for advertised audio and MKV formats.
-17. Duplicate-method detection and MusicVault branding consistency.
-18. Black theme and provider-specific YouTube red / Spotify green accents.
-19. Bounded, event-driven button, tab, queue and progress animations.
-20. Packaging scripts, CI workflows and publishing helper safety checks.
-21. Explicit disclosures that Android/iOS clients do not yet exist.
+- Complete suite runs: **300** (50 on each of six runner/Python combinations)
+- Passing test-case executions: **9,900**
+- Failed test runs: **0**
+- Result: **PASS for the tested Python core behaviours on the listed GitHub-hosted runners**
 
-## Platform boundaries
+These are repeated executions of one test suite, not 50 independent devices or 50 independently designed test plans per platform.
 
-This report records repeated runs of the same deterministic test suite on **one Linux x86_64 host**. It does not represent testing 50 separate devices or operating systems.
+## What the current suite tests
 
-- **Linux:** source tests and local FFmpeg media smoke tests passed.
-- **Windows:** a GitHub Actions build workflow is configured, but its runner must complete before Windows is marked tested.
-- **macOS Apple Silicon:** a build workflow is configured, but its runner must complete before macOS is marked tested. The current build is unsigned and not notarized.
-- **Android/iOS:** no mobile clients exist in this release; no mobile tests are claimed.
+1. Accepted YouTube video and playlist URL forms, and extraction of their video/playlist identifiers.
+2. Rejection of unsafe YouTube links including HTTP, deceptive host suffixes, arbitrary hosts, embedded credentials, non-standard ports, unsupported schemes, and oversized inputs.
+3. Separation of Spotify from the download engine.
+4. Validation of supported official Spotify hand-off links, and rejection of unsafe Spotify links.
+5. Per-user application data path selection for Windows and macOS.
+6. Creation and basic write access validation for the selected output directory.
+7. yt-dlp option construction for MP3, WAV, FLAC, M4A, AAC, OPUS, and MKV.
+8. Checks that the generated download options do not enable cookie-file access and keep remote components disabled.
+9. The current MP3 export quality target (320 kbps).
+10. Handling of invalid values in byte-size and ETA display helpers.
+11. Application name and version identity.
 
-PySide6 is not installed in the Linux sandbox. Source syntax, static UI/installer configuration and regression tests were checked, but a rendered Qt window, packaged Windows installer, and macOS app/DMG were not executed here.
+## Packaging / platform validation
 
-The suite uses generated local media for FFmpeg round trips. It does not prove that every remote YouTube URL will download or validate every file produced by a live platform transfer. A real transfer remains subject to platform availability and restrictions.
+- **Windows source tests:** Passed on Windows latest with Python 3.11 and 3.13.
+- **macOS source tests:** Passed on macOS 15 Apple Silicon with Python 3.11 and 3.13.
+- **Linux source tests:** Passed on Ubuntu latest with Python 3.11 and 3.13.
+- **Windows installer build:** A separate GitHub Actions packaging job is enabled on pushes to `main`. Its result must be checked in the Actions run before treating the installer as verified.
+- **macOS app/DMG build:** A separate Apple Silicon packaging job is enabled on pushes to `main`. Its result must be checked in the Actions run before treating the app bundle or disk image as verified.
+- **Android/iOS:** No mobile clients exist in this repository; no mobile build or test is claimed.
 
-Lossy re-encoding cannot restore information absent from the source. MusicVault selects the best available source audio and requests 320 kbps for supported lossy exports; source quality remains the ceiling. WAV/FLAC are not constrained by a lossy bitrate cap.
+The Python test matrix does **not** render or interact with the Qt UI, run a live YouTube transfer, validate every downloaded media file, test installer upgrades/uninstalls, or certify app signing/notarization. Native packaging workflows include an offscreen app smoke-test stage, but only a completed successful packaging run proves that stage passed.
 
-No test suite proves an application has zero defects. Release qualification still requires native platform build, GUI smoke, installer/uninstaller, accessibility and real-device validation.
+## Important limitations
+
+The suite does not prove every public YouTube URL will download. Provider availability, network behaviour, and platform restrictions remain outside the unit-test environment. MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions, or platform access controls.
+
+The tests check the requested output-format option mapping, not a full encode/decode round trip for every format. A live download and decoded output should be checked before attaching a release binary to a public release.
+
+Lossy re-encoding cannot restore information absent from the source. MusicVault requests a 320 kbps target for the formats configured as lossy exports; the source stream remains the quality ceiling. WAV/FLAC are not constrained by a lossy bitrate cap.
+
+The macOS packaging pipeline currently targets Apple Silicon and is unsigned/not notarized. The Windows installer is not code-signed. Android/iOS are not implemented. No test suite proves an application has zero defects.
