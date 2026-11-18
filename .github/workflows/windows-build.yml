@@ -81,7 +81,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download Windows release assets
+      - name: Check out source for GitHub CLI`r`n        uses: actions/checkout@v4`r`n      - name: Download Windows release assets
         uses: actions/download-artifact@v4
         with:
           name: musicvault-windows-x64
