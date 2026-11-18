@@ -5,6 +5,16 @@ on:
   push:
     tags:
       - "v*"
+  pull_request:
+    paths:
+      - "musicvault_*.py"
+      - "scripts/build_macos.sh"
+      - "scripts/stage_deno.py"
+      - "requirements*.txt"
+      - "assets/**"
+      - "mobile/**"
+      - ".github/workflows/macos-build.yml"
+      - ".github/workflows/mobile-build.yml"
 
 permissions:
   contents: read
