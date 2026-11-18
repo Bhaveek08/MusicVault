@@ -92,3 +92,6 @@ def test_android_smoke_verification_waits_for_rendered_webview_ui():
     assert 'Log.i(SMOKE_TEST_TAG, "UI_READY")' in native_shell
     assert "MusicVault UI did not become ready in 45 seconds" in workflow
     assert 'grep -q "UI_READY"' in workflow
+    assert "target: default" in workflow
+    assert "-gpu swiftshader_indirect -no-snapshot" in workflow
+    assert "emulator-boot-timeout: 900" in workflow
