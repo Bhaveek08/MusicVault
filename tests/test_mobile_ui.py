@@ -29,8 +29,8 @@ def test_youtube_input_trims_pasted_whitespace():
     "javascript:alert(1)",
     "https://www.youtube.com/watch?v=short",
     "https://www.youtube.com/playlist?list=bad",
-    "https://www.youtube.com/watch?v=BaW_jenozKc\r",
-    "https://www.youtube.com/watch?v=BaW_jenozKc\t",
+    "https://www.youtube.com/\nwatch?v=BaW_jenozKc",
+    "https://www.youtube.com/watch\tv=BaW_jenozKc",
     "",
     "x" * 3000,
 ])
@@ -60,7 +60,7 @@ def test_spotify_official_share_links(url):
     "https://open.spotify.com:444/track/1234567890123456789012",
     "https://open.spotify.com/not-a-type/1234567890123456789012",
     "https://open.spotify.com/track/short",
-    "https://open.spotify.com/track/1234567890123456789012\r",
+    "https://open.spotify.com/track/1234567890123456789012\n?si=x",
     "",
     "x" * 3000,
 ])
