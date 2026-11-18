@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added a touch-first Android/iOS UI prototype with safe YouTube/Spotify link validation; media downloading is intentionally not enabled in the mobile shell.
+- Added host-side mobile source-policy tests and Android/iOS toolchain-readiness checks, while keeping native package status explicit.
+- Organized platform scripts under `scripts/` and moved Windows version metadata into `installer/`.
+- Reduced the desktop Qt dependency from the full PySide6 bundle to PySide6-Essentials and removed the all-Qt-modules collection flags.
+
 ## 2.0.0 — 2026-11-18
 
 - Rebranded the desktop application as MusicVault across the UI, settings, logs, output folders, installers, and documentation.
