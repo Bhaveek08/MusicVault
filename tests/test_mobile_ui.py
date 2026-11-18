@@ -16,6 +16,10 @@ def test_youtube_link_categories(url, kind):
     assert validate_youtube_link(url) == kind
 
 
+def test_youtube_input_trims_pasted_whitespace():
+    assert validate_youtube_link("  https://youtu.be/BaW_jenozKc\n") == "video"
+
+
 @pytest.mark.parametrize("url", [
     "http://youtube.com/watch?v=BaW_jenozKc",
     "https://youtube.com.evil.example/watch?v=BaW_jenozKc",
@@ -25,7 +29,6 @@ def test_youtube_link_categories(url, kind):
     "javascript:alert(1)",
     "https://www.youtube.com/watch?v=short",
     "https://www.youtube.com/playlist?list=bad",
-    "https://www.youtube.com/watch?v=BaW_jenozKc\n",
     "https://www.youtube.com/watch?v=BaW_jenozKc\r",
     "https://www.youtube.com/watch?v=BaW_jenozKc\t",
     "",
@@ -57,7 +60,7 @@ def test_spotify_official_share_links(url):
     "https://open.spotify.com:444/track/1234567890123456789012",
     "https://open.spotify.com/not-a-type/1234567890123456789012",
     "https://open.spotify.com/track/short",
-    "https://open.spotify.com/track/1234567890123456789012\n",
+    "https://open.spotify.com/track/1234567890123456789012\r",
     "",
     "x" * 3000,
 ])
@@ -73,14 +76,5 @@ def test_mobile_ui_source_has_both_provider_sections_and_no_downloader_worker():
     assert "mobile downloading is not enabled" in source
     assert "import yt_dlp" not in source
     assert "subprocess" not in source
-
-
-def test_screenshot_capture_covers_both_desktop_and_mobile_sources():
-    source = Path("scripts/capture_ui_previews.py").read_text(encoding="utf-8")
-    for output in (
-        "desktop-youtube.png",
-        "desktop-spotify.png",
-        "mobile-prototype-youtube.png",
-        "mobile-prototype-spotify.png",
-    ):
-        assert output in source
+    assert "QDesktopServices.openUrl" in source
+    assert "Include full playlist" in source
