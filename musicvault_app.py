@@ -7,13 +7,13 @@ import sys
 import threading
 from dataclasses import dataclass
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QThread, QTimer, Qt, Signal
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, Signal
 from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout,
     QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
-    QProgressBar, QPushButton, QTabWidget, QVBoxLayout, QWidget,
+    QProgressBar, QPushButton, QTabWidget, QVBoxLayout, QWidget, QGraphicsOpacityEffect,
 )
 
 from musicvault_core import (
@@ -102,7 +102,10 @@ class Worker(QThread):
 class MotionButton(QPushButton):
     def __init__(self, label: str, parent=None):
         super().__init__(label, parent)
-        self._fade = QPropertyAnimation(self, b"windowOpacity", self)
+        self._opacity = QGraphicsOpacityEffect(self)
+        self._opacity.setOpacity(1.0)
+        self.setGraphicsEffect(self._opacity)
+        self._fade = QPropertyAnimation(self._opacity, b"opacity", self)
         self._fade.setDuration(110)
         self._fade.setEasingCurve(QEasingCurve.OutCubic)
         self.pressed.connect(lambda: self._animate(0.82))
@@ -110,7 +113,7 @@ class MotionButton(QPushButton):
 
     def _animate(self, value: float) -> None:
         self._fade.stop()
-        self._fade.setStartValue(self.windowOpacity())
+        self._fade.setStartValue(self._opacity.opacity())
         self._fade.setEndValue(value)
         self._fade.start()
 
@@ -124,7 +127,9 @@ class MusicVaultWindow(QMainWindow):
         self.jobs: list[Job] = []
         self.worker: Worker | None = None
         self.cancel_event = threading.Event()
-        self.output_dir = os.path.join(os.path.expanduser("~"), "Music", APP_NAME)
+        self.settings = QSettings(APP_NAME, APP_NAME)
+        default_output = os.path.join(os.path.expanduser("~"), "Music", APP_NAME)
+        self.output_dir = str(self.settings.value("output_dir", default_output, type=str))
         self._build_ui()
         self._apply_style()
         self.statusBar().showMessage("Ready")
@@ -343,6 +348,7 @@ class MusicVaultWindow(QMainWindow):
             return
         try:
             self.output_dir = str(validate_output_folder(selected))
+            self.settings.setValue("output_dir", self.output_dir)
             self.folder_label.setText(self.output_dir)
         except Exception as exc:
             QMessageBox.warning(self, APP_NAME, str(exc))
@@ -464,8 +470,9 @@ class MusicVaultWindow(QMainWindow):
         event.accept()
 
     def settings_sync(self) -> None:
-        # Keep the output path local to the OS user profile; no account is required.
-        return
+        # QSettings stores this path in the current OS user's application-data area.
+        self.settings.setValue("output_dir", self.output_dir)
+        self.settings.sync()
 
 
 def main() -> int:
