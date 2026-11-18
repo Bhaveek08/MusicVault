@@ -3,7 +3,7 @@ import pytest
 
 from musicvault_core import (
     APP_NAME, APP_VERSION, SourceValidationError, UnsupportedServiceError,
-    build_ytdlp_options, format_bytes, format_eta, get_app_data_dir,
+    build_ydl_options, format_bytes, format_eta, get_app_data_dir,
     validate_output_folder, validate_source_url, validate_spotify_url,
 )
 
@@ -79,7 +79,7 @@ def test_output_folder_creates_and_writes(tmp_path):
 @pytest.mark.parametrize("fmt", ["MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS", "MKV"])
 def test_supported_output_formats_are_mapped(fmt, tmp_path):
     src = validate_source_url("https://youtu.be/BaW_jenozKc")
-    opts = build_ytdlp_options(
+    opts = build_ydl_options(
         url=src.url, output_dir=tmp_path, output_format=fmt,
         include_playlist=False, ffmpeg_location=None,
         progress_hook=lambda data: None, logger=None, deno_path=None,
@@ -92,7 +92,7 @@ def test_supported_output_formats_are_mapped(fmt, tmp_path):
 
 def test_audio_targets_high_quality_when_lossy(tmp_path):
     src = validate_source_url("https://youtu.be/BaW_jenozKc")
-    opts = build_ytdlp_options(
+    opts = build_ydl_options(
         url=src.url, output_dir=tmp_path, output_format="MP3",
         include_playlist=False, ffmpeg_location=None,
         progress_hook=lambda data: None, logger=None, deno_path=None,
