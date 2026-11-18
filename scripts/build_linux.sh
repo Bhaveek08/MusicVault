@@ -57,12 +57,25 @@ Categories=AudioVideo;Audio;
 DESKTOP
 
 if command -v xvfb-run >/dev/null 2>&1 && command -v gdb >/dev/null 2>&1; then
-  # Capture a native backtrace if the frozen Qt process fails in the runner.
-  QT_QPA_PLATFORM=xcb xvfb-run -a gdb -batch \
+  # Capture a native backtrace and explicitly reject signals. GDB may return 0
+  # after reporting an inferior SIGSEGV, so inspect its output as well.
+  set +e
+  debug_output="$(QT_QPA_PLATFORM=xcb xvfb-run -a gdb -batch \
     -ex "set pagination off" \
     -ex run \
     -ex "thread apply all bt" \
-    --args "$APP_DIR/MusicVault" --smoke-test
+    --args "$APP_DIR/MusicVault" --smoke-test 2>&1)"
+  debug_status=$?
+  set -e
+  printf '%s\n' "$debug_output"
+  if printf '%s' "$debug_output" | grep -q "received signal SIGSEGV"; then
+    echo "The packaged MusicVault UI crashed with SIGSEGV during smoke test." >&2
+    exit 6
+  fi
+  if [[ "$debug_status" -ne 0 ]] || ! printf '%s' "$debug_output" | grep -q "exited normally"; then
+    echo "The packaged MusicVault UI did not exit cleanly." >&2
+    exit 7
+  fi
 else
   echo "xvfb-run and gdb are required for the packaged GUI smoke test." >&2
   exit 5
