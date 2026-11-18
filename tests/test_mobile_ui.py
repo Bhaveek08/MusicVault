@@ -73,7 +73,7 @@ def test_mobile_ui_source_has_both_provider_sections_and_no_downloader_worker():
     source = Path("mobile/app/main.py").read_text(encoding="utf-8")
     assert 'self._card("YouTube"' in source
     assert 'self._card("Spotify"' in source
-    assert "mobile downloading is not enabled" in source
+    assert "downloads are not enabled in this mobile build yet" in source.lower()
     assert "import yt_dlp" not in source
     assert "subprocess" not in source
     assert "QDesktopServices.openUrl" in source
