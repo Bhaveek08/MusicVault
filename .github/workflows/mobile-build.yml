@@ -44,7 +44,7 @@ jobs:
         run: |
           mkdir -p dist
           cp mobile/android/app/build/outputs/apk/debug/app-debug.apk dist/MusicVault-Android-debug.apk
-          zip -qr dist/MusicVault-Android-source.zip mobile/android mobile/shared
+          zip -qr dist/MusicVault-Android-source.zip mobile/android mobile/shared -x 'mobile/android/.gradle/*' 'mobile/android/app/build/*'
       - name: Upload Android test package
         uses: actions/upload-artifact@v4
         with:
@@ -56,16 +56,38 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          target: google_apis
+          target: default
           arch: x86_64
           profile: pixel_2
+          emulator-boot-timeout: 900
           disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim -camera-back none
+          # Keep CPU virtualization but force SwiftShader rendering. Hardware GPU
+          # rendering has caused ColorBuffer/ADB broken-pipe failures on hosted CI.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
+            adb logcat -c
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -n com.musicvault.mobile/.MainActivity
-            sleep 5
+            adb shell am force-stop com.musicvault.mobile
+            adb shell am start -W -n com.musicvault.mobile/.MainActivity
+
+            # Wait for the WebView to report that the shared screen is rendered
+            # and initialized; an Activity-only check can pass on the splash screen.
+            READY=0
+            for attempt in $(seq 1 45); do
+              if adb logcat -d -s MusicVaultSmokeTest:I | grep -q "UI_READY"; then
+                READY=1
+                break
+              fi
+              sleep 1
+            done
+            if [ "$READY" -ne 1 ]; then
+              echo "MusicVault UI did not become ready in 45 seconds"
+              adb logcat -d | grep -E "MusicVaultSmokeTest|chromium|AndroidRuntime" | tail -n 120 || true
+              exit 1
+            fi
+
             adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
+            sleep 2
             mkdir -p artifacts
             adb exec-out screencap -p > artifacts/android-emulator.png
       - name: Upload Android emulator screenshot

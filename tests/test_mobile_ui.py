@@ -78,3 +78,20 @@ def test_mobile_ui_source_has_both_provider_sections_and_no_downloader_worker():
     assert "subprocess" not in source
     assert "QDesktopServices.openUrl" in source
     assert "Include full playlist" in source
+
+def test_android_smoke_verification_waits_for_rendered_webview_ui():
+    shared_ui = Path("mobile/shared/app.js").read_text(encoding="utf-8")
+    native_shell = Path(
+        "mobile/android/app/src/main/java/com/musicvault/mobile/MainActivity.java"
+    ).read_text(encoding="utf-8")
+    workflow = Path(".github/workflows/mobile-build.yml").read_text(encoding="utf-8")
+
+    assert 'dataset.musicvaultReady = "true"' in shared_ui
+    assert "document.getElementById('youtubeTab')" in native_shell
+    assert "document.getElementById('spotifyTab')" in native_shell
+    assert 'Log.i(SMOKE_TEST_TAG, "UI_READY")' in native_shell
+    assert "MusicVault UI did not become ready in 45 seconds" in workflow
+    assert 'grep -q "UI_READY"' in workflow
+    assert "target: default" in workflow
+    assert "-gpu swiftshader_indirect -no-snapshot" in workflow
+    assert "emulator-boot-timeout: 900" in workflow
