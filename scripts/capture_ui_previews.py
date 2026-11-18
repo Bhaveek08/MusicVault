@@ -10,7 +10,7 @@ if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from PySide6.QtCore import QSize
-from PySide6.QtGui import QColor, QPainter, QPixmap
+from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtWidgets import QApplication, QTabWidget
 
 from musicvault_app import MusicVaultWindow
@@ -34,9 +34,7 @@ def render(widget, output: Path, size: QSize, *, desktop_tab: int | None = None,
 
     image = QPixmap(widget.size())
     image.fill(QColor("#080808"))
-    painter = QPainter(image)
-    widget.render(painter)
-    painter.end()
+    widget.render(image)
     output.parent.mkdir(parents=True, exist_ok=True)
     if not image.save(str(output), "PNG"):
         raise RuntimeError(f"Could not save UI preview to {output}")
