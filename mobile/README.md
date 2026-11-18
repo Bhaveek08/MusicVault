@@ -1,58 +1,70 @@
-# Mobile workstream
+# MusicVault mobile apps
 
-This directory contains the first touch-first MusicVault UI shell for Android and iOS.
+This directory contains the native Android and iOS shells and the shared mobile interface.
 
-## Status
+## What is implemented
 
-- The UI shell is an early prototype. It is not a released Android or iOS app.
-- Automated host-side tests check the mobile UI source structure and YouTube/Spotify URL validation. They do not render a native phone UI.
-- The preview queue is local UI state only. It does not start a media download.
-- The desktop downloader is deliberately not imported into this shell.
+- **Android:** native Java Activity hosting the bundled interface in an Android WebView.
+- **iOS:** SwiftUI app hosting the same bundled interface in WKWebView.
+- **Shared UI:** offline HTML/CSS/JavaScript in `mobile/shared/`; the phone platforms use the same layout and client-side validation.
+- **Spotify:** validated official Spotify HTTPS share links are handed to the Spotify app or system.
+- **YouTube:** links can be validated and staged in a local preview queue.
+- **Privacy:** the app interface is packaged locally; it does not load a remote web page as its UI.
 
-## Why downloads are not enabled yet
+## What is not implemented yet
 
-The desktop app's media path relies on yt-dlp/yt-dlp-ejs, a Deno executable, and FFmpeg. Those components cannot simply be copied into an iOS app bundle. Qt's current iOS deploy tool documents that third-party packages are not yet automatically packaged; Python C extensions need target-specific cross-compilation and native bundling. iOS also requires app-sandbox-compatible media storage and native background task design.
+Mobile media downloads are disabled. The desktop media pipeline depends on yt-dlp/yt-dlp-ejs, Deno and FFmpeg. It has not been ported to mobile app sandboxes, storage APIs or background execution. The mobile queue is preview-only and does not download media. Do not treat this test build as a functional mobile downloader.
 
-The mobile workstream therefore has a separate entry point with no download engine. It must not be presented as a functional downloader until the complete media pipeline has been ported and validated on real devices.
+## Download and test the latest builds
 
-## Local UI check
+Open the [Mobile native builds workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile-build.yml), select a successful run, then download:
 
-Install the pinned desktop runtime dependencies and run:
+- `MusicVault-Android-test-build`: debug APK and Android/shared source.
+- `MusicVault-Android-emulator-verification`: screenshot captured after the native WebView confirms the shared UI is initialized.
+- `MusicVault-iOS-test-build`: iOS Simulator app archive, Xcode project source and simulator screenshot.
+
+CI artifacts are temporary test outputs (30-day retention). The APK is debug-signed for testing, not signed for Play Store release. The iOS app archive targets the iOS Simulator and cannot be installed on a physical iPhone/iPad.
+
+## Install on Android
+
+The Android project declares a minimum API level of 24 (Android 7.0+), subject to the device's installed WebView provider.
+
+1. Download and extract the `MusicVault-Android-test-build` artifact.
+2. Transfer `MusicVault-Android-debug.apk` to your phone.
+3. Open the APK and allow installation from that file source if Android asks.
+4. Launch MusicVault. The YouTube and Spotify tabs should appear; downloads are marked as not connected.
+
+For a USB-connected device with Android Platform Tools installed:
 
 ```bash
-python -m pip install -r requirements-test.txt
-python -m pytest -q tests/test_mobile_ui.py
-python mobile/app/main.py
+adb install -r MusicVault-Android-debug.apk
+adb shell am start -n com.musicvault.mobile/.MainActivity
 ```
 
-## Native deployment prerequisites
+To build from source, open `mobile/android/` in Android Studio with JDK 17, Android SDK Platform 35 and Gradle 8.9, or run:
 
-Android deployment uses Qt for Python's `pyside6-android-deploy` tool on a Linux or macOS host, an Android SDK/NDK, and Qt Android wheels for the target ABI.
+```bash
+cd mobile/android
+gradle --no-daemon assembleDebug
+```
 
-iOS deployment uses `pyside6-ios-deploy` on macOS with Xcode, a Python.xcframework, and matching PySide6/Shiboken6 wheels for the iOS device or simulator target. The tool generates an Xcode project; Xcode performs the build and signing.
+The APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 
-See [Qt for Python Android deployment](https://doc.qt.io/qtforpython-6/deployment/deployment-pyside6-android-deploy.html) and [iOS deployment](https://doc.qt.io/qtforpython-6/deployment/deployment-pyside6-ios-deploy.html).
+## Run on iOS
 
+On a Mac with Xcode:
 
-## UI review screenshots
+1. Extract `MusicVault-iOS-test-build`.
+2. Extract `MusicVault-iOS-Xcode-project.zip`.
+3. Open `mobile/ios/MusicVault.xcodeproj` in Xcode.
+4. Select the `MusicVault` scheme and an iPhone/iPad simulator, then Run.
 
-The Mobile UI workflow generates four PNGs from the real Qt widgets, using the current source code:
+The included `MusicVault-iOS-Simulator.app.zip` is a prebuilt simulator app for inspection/testing on the simulator. It is not an iOS device package.
 
-- Desktop YouTube tab — 1200 × 820
-- Desktop Spotify tab — 1200 × 820
-- Mobile YouTube prototype — 390 × 844
-- Mobile Spotify prototype — 390 × 844
+For a physical iPhone/iPad, connect the device, choose your Apple Developer Team in **Signing & Capabilities**, set a bundle identifier that your team controls, then build and run from Xcode. An IPA signed for your device requires your Apple signing identity and provisioning profile; the simulator CI build cannot create that on your behalf.
 
-Open the latest [Mobile UI workflow run](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) and download the `musicvault-ui-previews` artifact. These are actual Qt widget renders created under a virtual X11 desktop. They are not Android/iOS device screenshots.
+## End-to-end verification
 
-## Current native build blockers
+The native workflow builds the Android debug APK, installs it on an Android 15 emulator, waits for a native WebView readiness signal emitted only after the shared JavaScript initializes and the expected controls/theme are present, and then saves a screenshot. It separately builds the iOS Simulator app, installs it on an iPhone simulator, launches it, and saves a screenshot.
 
-- **Android:** the CI attempt to obtain Qt Android target wheels reached a commercial-license credential gate. No native APK/AAB is generated. The workflow reports this blocker without marking host-side UI tests as failed.
-- **iOS:** the CI runner verifies Xcode and the iOS Simulator SDK, but matching target PySide6/Shiboken wheels, app signing and a simulator app build are not yet configured.
-
-## Native test builds
-
-- **Android:** open the android/ folder as a Gradle project in Android Studio, or download the latest `MusicVault-Android-test-build` artifact from [Mobile native builds](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile-build.yml). Install the `MusicVault-Android-debug.apk` on Android 9 or later. This is an unsigned debug APK for testing, not a Play Store release.
-- **iOS:** open `ios/MusicVault.xcodeproj` in Xcode and run the `MusicVault` scheme on an iOS 16+ simulator. The workflow artifact contains a simulator app archive and a standalone Xcode project source bundle. For a real iPhone/iPad, select your Apple Developer Team in Xcode and build/sign locally; the simulator archive is not a device IPA.
-
-Both clients use the same local HTML/CSS/JS UI. They only allow external navigation to official Spotify HTTPS links. Neither client has the yt-dlp/FFmpeg download engine connected.
+A successful emulator/simulator run verifies the app shell and shared UI—not physical-device behaviour, store signing or media downloading. Test on your actual devices before release.
