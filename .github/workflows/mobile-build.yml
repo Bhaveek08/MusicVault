@@ -82,16 +82,32 @@ jobs:
           script: |
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
             adb shell am start -n com.musicvault.mobile/.MainActivity
-            sleep 5
+            sleep 8
             adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
             mkdir -p artifacts
             adb exec-out screencap -p > artifacts/android-emulator.png
+            adb logcat -d -s chromium:V WebView:V System.err:V > artifacts/android-webview.log
+            python3 -m pip install --quiet pillow
+            python3 - <<'PY'
+            from PIL import Image
+
+            image = Image.open("artifacts/android-emulator.png").convert("RGB")
+            width, height = image.size
+            content = image.crop((0, int(height * 0.08), width, int(height * 0.92)))
+            visible = sum(1 for pixel in content.getdata() if max(pixel) > 36)
+            ratio = visible / (content.width * content.height)
+            print(f"Non-background pixels in app content: {ratio:.3%}")
+            if ratio < 0.2 / 100:
+                raise SystemExit("Android app screenshot is blank; rendered UI was not detected")
+            PY
       - name: Upload Android emulator screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: MusicVault-Android-emulator-verification
-          path: artifacts/android-emulator.png
+          path: |
+            artifacts/android-emulator.png
+            artifacts/android-webview.log
           if-no-files-found: ignore
           retention-days: 30
 
