@@ -56,10 +56,15 @@ Terminal=false
 Categories=AudioVideo;Audio;
 DESKTOP
 
-if command -v xvfb-run >/dev/null 2>&1; then
-  QT_QPA_PLATFORM=xcb xvfb-run -a "$APP_DIR/MusicVault" --smoke-test
+if command -v xvfb-run >/dev/null 2>&1 && command -v gdb >/dev/null 2>&1; then
+  # Capture a native backtrace if the frozen Qt process fails in the runner.
+  QT_QPA_PLATFORM=xcb xvfb-run -a gdb -batch \
+    -ex "set pagination off" \
+    -ex run \
+    -ex "thread apply all bt" \
+    --args "$APP_DIR/MusicVault" --smoke-test
 else
-  echo "xvfb-run is required for the packaged GUI smoke test." >&2
+  echo "xvfb-run and gdb are required for the packaged GUI smoke test." >&2
   exit 5
 fi
 
