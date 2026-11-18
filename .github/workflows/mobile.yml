@@ -88,18 +88,17 @@ jobs:
           echo "Could not publish UI preview screenshots after five retries."
           exit 1
 
-  android-target-readiness:
-    name: Android deployment prerequisites
+  android-build-link:
+    name: Android native build workflow
     runs-on: ubuntu-22.04
     steps:
-      - name: Record the current build blocker
+      - name: Point to native APK and emulator tests
         run: |
-          echo "::warning::Qt for Python Android target wheel deployment currently requires Qt commercial-license credentials on the public runner. No APK/AAB build or Android device test is being claimed."
-          echo "Android UI policy tests run on Windows and Ubuntu desktop hosts."
-          echo "A native Android build remains blocked pending a licensed Qt deployment toolchain."
+          echo "Native Android APK builds and emulator smoke tests run in .github/workflows/mobile-build.yml."
+          echo "This workflow contains shared UI policy tests only."
 
-  ios-toolchain-check:
-    name: iOS toolchain readiness
+  ios-host-tests:
+    name: iOS shared UI host checks
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
@@ -115,7 +114,7 @@ jobs:
       - name: Verify mobile validation and UI imports
         run: |
           python -c "from mobile.app.source_validation import validate_youtube_link; from mobile.app.main import MusicVaultMobileWindow; assert validate_youtube_link('https://youtu.be/BaW_jenozKc') == 'video'; print(MusicVaultMobileWindow.__name__)"
-      - name: Record iOS deployment boundary
+      - name: Record native iOS build location
         run: |
-          echo "::warning::Host Xcode/Simulator SDK is available, but target-specific PySide6/Shiboken iOS wheels and signing are not provisioned. No IPA or simulator app build is being claimed."
-          echo "iOS URL policy and mobile UI imports are checked on desktop/macOS CI; simulator/device validation remains pending."
+          echo "Native iOS Simulator builds and simulator launch smoke tests run in .github/workflows/mobile-build.yml."
+          echo "A physical-device IPA still requires an Apple Developer Team and signing profile."
