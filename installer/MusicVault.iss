@@ -4,7 +4,7 @@
 #define MyAppExeName "MusicVault.exe"
 
 [Setup]
-AppId={{D7D32FC1-10F0-4C0B-AE1C-1C5C17EB315A}
+AppId={{D7D32FC1-10F0-4C0B-AE1C-1C5C17EB315A}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
