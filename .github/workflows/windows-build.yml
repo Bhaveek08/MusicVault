@@ -35,7 +35,6 @@ jobs:
           name: musicvault-windows-x64
           path: |
             dist/MusicVault-Setup.exe
-            dist/MusicVault/**
             THIRD_PARTY_NOTICES.txt
             QA_REPORT.md
           if-no-files-found: error
