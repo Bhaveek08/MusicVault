@@ -2,6 +2,16 @@ name: Windows build
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/windows-build.yml"
+      - "musicvault_app.py"
+      - "musicvault_core.py"
+      - "requirements*.txt"
+      - "scripts/build_windows.bat"
+      - "installer/**"
+      - "assets/**"
+      - "README.md"
   push:
     tags:
       - "v*"
@@ -13,6 +23,8 @@ jobs:
   build:
     name: Build MusicVault for Windows x64
     runs-on: windows-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -29,13 +41,50 @@ jobs:
         run: |
           set CI=1
           scripts\build_windows.bat
-      - name: Upload installer and notices
+      - name: Package Windows release ZIP
+        shell: pwsh
+        run: |
+          $packageFiles = @(
+            'dist/MusicVault-Setup.exe',
+            'THIRD_PARTY_NOTICES.txt',
+            'QA_REPORT.md'
+          )
+          Compress-Archive -Path $packageFiles -DestinationPath 'dist/MusicVault-Windows-x64.zip' -CompressionLevel Optimal -Force
+      - name: Upload installer, ZIP and notices
         uses: actions/upload-artifact@v4
         with:
           name: musicvault-windows-x64
           path: |
             dist/MusicVault-Setup.exe
+            dist/MusicVault-Windows-x64.zip
             THIRD_PARTY_NOTICES.txt
             QA_REPORT.md
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: Publish tagged Windows release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: musicvault-windows-x64
+          path: release-assets
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $assets = @(
+            'release-assets/dist/MusicVault-Setup.exe',
+            'release-assets/dist/MusicVault-Windows-x64.zip',
+            'release-assets/THIRD_PARTY_NOTICES.txt',
+            'release-assets/QA_REPORT.md'
+          )
+          gh release create $tag $assets --title "MusicVault $tag" --generate-notes --verify-tag
