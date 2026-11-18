@@ -6,11 +6,9 @@ mobile media execution needs a platform-specific FFmpeg/JavaScript runtime port.
 from __future__ import annotations
 
 import argparse
-import re
 import sys
-from urllib.parse import parse_qs, urlsplit
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, QUrl
+from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel,
@@ -18,81 +16,15 @@ from PySide6.QtWidgets import (
     QStackedWidget, QVBoxLayout, QWidget,
 )
 
-YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"}
-SPOTIFY_HOSTS = {"open.spotify.com", "www.spotify.com", "spotify.com", "spotify.link"}
-VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
-PLAYLIST_ID = re.compile(r"^[A-Za-z0-9_-]{10,80}$")
+from mobile.app.source_validation import validate_spotify_link, validate_youtube_link
+
+
 FORMATS = ("MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS", "MKV")
 
 
-def validate_youtube_link(value: str) -> str:
-    """Validate a public YouTube URL without network requests or redirects."""
-    if not isinstance(value, str) or not value.strip() or len(value) > 2048:
-        raise ValueError("Paste a valid YouTube video or playlist link.")
-    parsed = urlsplit(value.strip())
-    host = (parsed.hostname or "").lower().rstrip(".")
-    if parsed.scheme != "https" or host not in YOUTUBE_HOSTS:
-        raise ValueError("Use an official HTTPS YouTube link.")
-    if parsed.username or parsed.password or parsed.port not in (None, 443):
-        raise ValueError("That YouTube link contains unsupported URL details.")
-    query = parse_qs(parsed.query, keep_blank_values=False)
-    parts = [part for part in parsed.path.split("/") if part]
-
-    if host == "youtu.be":
-        if not parts or not VIDEO_ID.fullmatch(parts[0]):
-            raise ValueError("That shortened YouTube link does not contain a valid video ID.")
-        return "video"
-
-    if parts == ["watch"]:
-        video_id = query.get("v", [""])[0]
-        if not VIDEO_ID.fullmatch(video_id):
-            raise ValueError("That YouTube link does not contain a valid video ID.")
-        return "video"
-
-    if len(parts) == 2 and parts[0] in {"shorts", "live", "embed", "v"}:
-        if not VIDEO_ID.fullmatch(parts[1]):
-            raise ValueError("That YouTube link does not contain a valid video ID.")
-        return "video"
-
-    if parts == ["playlist"]:
-        playlist_id = query.get("list", [""])[0]
-        if not PLAYLIST_ID.fullmatch(playlist_id):
-            raise ValueError("That YouTube playlist link is missing a valid playlist ID.")
-        return "playlist"
-
-    raise ValueError("Use a YouTube video or playlist link.")
-
-
-def validate_spotify_link(value: str) -> str:
-    """Validate an official Spotify HTTPS link before handing it to Spotify."""
-    if not isinstance(value, str) or not value.strip() or len(value) > 2048:
-        raise ValueError("Paste a valid Spotify share link.")
-    parsed = urlsplit(value.strip())
-    host = (parsed.hostname or "").lower().rstrip(".")
-    if parsed.scheme != "https" or host not in SPOTIFY_HOSTS:
-        raise ValueError("Use an official HTTPS Spotify link.")
-    if parsed.username or parsed.password or parsed.port not in (None, 443):
-        raise ValueError("That Spotify link contains unsupported URL details.")
-    if not parsed.path or parsed.path == "/":
-        raise ValueError("Paste a Spotify track, album, artist or playlist link.")
-    return value.strip()
-
-
 class AnimatedButton(QPushButton):
-    """Small opacity feedback; no continuously running animation."""
-    def __init__(self, label: str, parent=None):
-        super().__init__(label, parent)
-        self._anim = QPropertyAnimation(self, b"windowOpacity", self)
-        self._anim.setDuration(100)
-        self._anim.setEasingCurve(QEasingCurve.OutCubic)
-        self.pressed.connect(lambda: self._fade(0.86))
-        self.released.connect(lambda: self._fade(1.0))
-
-    def _fade(self, target: float) -> None:
-        self._anim.stop()
-        self._anim.setStartValue(self.windowOpacity())
-        self._anim.setEndValue(target)
-        self._anim.start()
+    """Touch feedback is provided by the platform and stylesheet pressed state."""
+    pass
 
 
 class MusicVaultMobileWindow(QWidget):
