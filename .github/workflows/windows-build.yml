@@ -5,6 +5,17 @@ on:
   push:
     tags:
       - "v*"
+  pull_request:
+    paths:
+      - "musicvault_*.py"
+      - "scripts/build_windows.bat"
+      - "scripts/stage_deno.py"
+      - "installer/**"
+      - "requirements*.txt"
+      - "assets/**"
+      - "mobile/**"
+      - ".github/workflows/windows-build.yml"
+      - ".github/workflows/mobile-build.yml"
 
 permissions:
   contents: read
