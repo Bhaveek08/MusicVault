@@ -5,6 +5,7 @@ import argparse
 import os
 import sys
 import threading
+import shiboken6
 from dataclasses import dataclass
 
 from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, Signal
@@ -628,14 +629,22 @@ def main() -> int:
     app.setOrganizationName(APP_NAME)
     window = MusicVaultWindow()
     if args.smoke_test:
-        # Exercise real widget construction, layout, paint, and orderly teardown.
+        # Exercise real widget construction, layout, paint, and deterministic
+        # QObject destruction before CPython runs PySide's process-exit cleanup.
         window.show()
         app.processEvents()
         window.close()
         app.processEvents()
+        shiboken6.delete(window)
+        shiboken6.delete(app)
         return 0
     window._animate_intro()
-    return app.exec()
+    exit_code = app.exec()
+    window.close()
+    app.processEvents()
+    shiboken6.delete(window)
+    shiboken6.delete(app)
+    return exit_code
 
 
 if __name__ == "__main__":
