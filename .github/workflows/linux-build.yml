@@ -1,0 +1,46 @@
+name: Linux build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "musicvault_*.py"
+      - "scripts/build_linux.sh"
+      - ".github/workflows/linux-build.yml"
+      - "requirements*.txt"
+  pull_request:
+    paths:
+      - "musicvault_*.py"
+      - "scripts/build_linux.sh"
+      - ".github/workflows/linux-build.yml"
+      - "requirements*.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Linux x86_64 portable package
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.8
+      - name: Install Linux GUI runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libegl1 libgl1 libxkbcommon0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0
+      - name: Build and smoke-test portable app
+        run: bash scripts/build_linux.sh
+      - name: Upload Linux package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicVault-Linux-x86_64
+          path: dist/MusicVault-Linux-x86_64.tar.gz
+          if-no-files-found: error
+          retention-days: 30
