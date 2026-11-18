@@ -16,7 +16,10 @@ from PySide6.QtWidgets import (
     QStackedWidget, QVBoxLayout, QWidget,
 )
 
-from mobile.app.source_validation import validate_spotify_link, validate_youtube_link
+try:
+    from .source_validation import validate_spotify_link, validate_youtube_link
+except ImportError:  # Direct script invocation during local preview/deployment.
+    from source_validation import validate_spotify_link, validate_youtube_link
 
 
 FORMATS = ("MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS", "MKV")
