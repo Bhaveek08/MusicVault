@@ -143,4 +143,6 @@
   });
 
   renderQueue();
+  // Native smoke tests wait for this after the shared UI and event handlers are ready.
+  document.documentElement.dataset.musicvaultReady = "true";
 })();
