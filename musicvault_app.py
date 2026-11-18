@@ -468,7 +468,7 @@ class MusicVaultWindow(QMainWindow):
             QProgressBar { background:#252B34; border:0; border-radius:4px; height:8px; }
             QProgressBar::chunk { background:#D93640; border-radius:4px; }
             QStatusBar { color:#A6B0BD; background:#0B0D10; border-top:1px solid #2A313C; }
-        """)")
+        """)
 
     def _tab_changed(self, index: int) -> None:
         self.statusBar().showMessage("YouTube downloads" if index == 0 else "Spotify link hand-off", 2500)
