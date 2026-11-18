@@ -304,7 +304,7 @@ def build_ydl_options(
         }
         # For lossy exports, request a high-quality 320 kbps encode. WAV and
         # FLAC are lossless targets and must not receive a lossy bitrate cap.
-        if fmt in {"MP3", "M4A", "AAC", "OPUS }
+        if fmt in {"MP3", "M4A", "AAC", "OPUS"}:
             audio_postprocessor["preferredquality"] = "320"
         options.update({
             "format": "bestaudio/best",
