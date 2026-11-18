@@ -64,8 +64,16 @@ jobs:
           script: |
             adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
             adb shell am start -n com.musicvault.mobile/.MainActivity
-            sleep 5
-            adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
+            for attempt in $(seq 1 15); do
+              if adb shell pidof com.musicvault.mobile >/dev/null; then
+                break
+              fi
+              if [ "$attempt" -eq 15 ]; then
+                adb logcat -d -t 200
+                exit 1
+              fi
+              sleep 1
+            done
             mkdir -p artifacts
             adb exec-out screencap -p > artifacts/android-emulator.png
       - name: Upload Android emulator screenshot
