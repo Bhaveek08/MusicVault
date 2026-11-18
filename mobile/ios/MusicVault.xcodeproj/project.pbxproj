@@ -7,7 +7,7 @@
         A10000000000000000000001 /* MusicVaultApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001; };
         A10000000000000000000002 /* shared in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
         B10000000000000000000001 /* MusicVaultApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicVaultApp.swift; sourceTree = "<group>"; };
-        B10000000000000000000002 /* shared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../shared; sourceTree = "<group>"; };
+        B10000000000000000000002 /* shared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../../shared; sourceTree = "<group>"; };
         B10000000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
         B10000000000000000000004 /* MusicVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
         C10000000000000000000001 = {
