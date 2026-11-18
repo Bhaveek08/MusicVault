@@ -123,8 +123,8 @@ class MusicVaultWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} — Downloads")
-        self.setMinimumSize(780, 590)
-        self.resize(980, 700)
+        self.setMinimumSize(980, 760)
+        self.resize(1120, 840)
         self.jobs: list[Job] = []
         self.worker: Worker | None = None
         self.cancel_event = threading.Event()
@@ -139,8 +139,8 @@ class MusicVaultWindow(QMainWindow):
         card = QFrame()
         card.setObjectName("Card")
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(18, 16, 18, 16)
-        layout.setSpacing(12)
+        layout.setContentsMargins(20, 18, 20, 18)
+        layout.setSpacing(14)
         label = QLabel(title)
         label.setObjectName("SectionTitle")
         layout.addWidget(label)
@@ -151,8 +151,8 @@ class MusicVaultWindow(QMainWindow):
         root.setObjectName("Root")
         self.setCentralWidget(root)
         outer = QVBoxLayout(root)
-        outer.setContentsMargins(24, 20, 24, 18)
-        outer.setSpacing(18)
+        outer.setContentsMargins(28, 20, 28, 14)
+        outer.setSpacing(16)
 
         # Compact app header.
         header = QHBoxLayout()
@@ -185,14 +185,14 @@ class MusicVaultWindow(QMainWindow):
         outer.addLayout(header)
 
         columns = QHBoxLayout()
-        columns.setSpacing(16)
+        columns.setSpacing(20)
 
         # Left: source and export controls.
         left_column = QVBoxLayout()
-        left_column.setSpacing(14)
+        left_column.setSpacing(18)
 
         intro = QVBoxLayout()
-        intro.setSpacing(4)
+        intro.setSpacing(7)
         page_title = QLabel("Downloads")
         page_title.setObjectName("PageTitle")
         intro.addWidget(page_title)
@@ -208,8 +208,8 @@ class MusicVaultWindow(QMainWindow):
 
         youtube = QWidget()
         ybox = QVBoxLayout(youtube)
-        ybox.setContentsMargins(14, 16, 14, 16)
-        ybox.setSpacing(14)
+        ybox.setContentsMargins(12, 10, 12, 10)
+        ybox.setSpacing(16)
 
         source_card, source_layout = self._card("YouTube")
         source_hint = QLabel("Paste a video or playlist URL")
@@ -249,7 +249,7 @@ class MusicVaultWindow(QMainWindow):
         format_group.addWidget(format_label)
         self.format_box = QComboBox()
         self.format_box.addItems(ALL_FORMATS)
-        self.format_box.setMinimumHeight(42)
+        self.format_box.setMinimumHeight(46)
         self.format_box.setAccessibleName("Output format")
         format_group.addWidget(self.format_box)
         settings_row.addLayout(format_group, 1)
@@ -260,7 +260,7 @@ class MusicVaultWindow(QMainWindow):
         playlist_label.setObjectName("Eyebrow")
         playlist_group.addWidget(playlist_label)
         self.playlist_check = QCheckBox("Full playlist")
-        self.playlist_check.setMinimumHeight(42)
+        self.playlist_check.setMinimumHeight(46)
         playlist_group.addWidget(self.playlist_check)
         settings_row.addLayout(playlist_group, 1)
         settings_layout.addLayout(settings_row)
@@ -276,22 +276,24 @@ class MusicVaultWindow(QMainWindow):
         self.folder_label.setObjectName("PathLabel")
         self.folder_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.folder_label.setWordWrap(False)
-        self.folder_label.setMinimumHeight(34)
+        self.folder_label.setMinimumHeight(36)
+        self.folder_label.setToolTip(self.output_dir)
         folder_stack.addWidget(self.folder_label)
         folder_row.addLayout(folder_stack, 1)
 
         browse = MotionButton("Change")
         browse.setObjectName("SecondaryButton")
-        browse.setMinimumHeight(40)
+        browse.setMinimumHeight(44)
         browse.clicked.connect(self.choose_folder)
         folder_row.addWidget(browse, 0, Qt.AlignBottom)
         settings_layout.addLayout(folder_row)
 
         add_button = MotionButton("Add to queue")
         add_button.setObjectName("YoutubeButton")
-        add_button.setMinimumHeight(46)
+        add_button.setMinimumHeight(50)
         add_button.clicked.connect(self.add_to_queue)
         settings_layout.addWidget(add_button)
+        settings_card.setMinimumHeight(286)
         ybox.addWidget(settings_card)
         ybox.addStretch(1)
 
@@ -341,7 +343,7 @@ class MusicVaultWindow(QMainWindow):
 
         # Right: live queue and concise format reference.
         right_column = QVBoxLayout()
-        right_column.setSpacing(14)
+        right_column.setSpacing(16)
 
         queue_card, queue_layout = self._card("Download queue")
         queue_header = QHBoxLayout()
@@ -362,7 +364,7 @@ class MusicVaultWindow(QMainWindow):
         self.queue_empty.setWordWrap(True)
         self.queue_list = QListWidget()
         self.queue_list.setObjectName("QueueList")
-        self.queue_list.setMinimumHeight(218)
+        self.queue_list.setMinimumHeight(176)
         self.queue_list.setAccessibleName("Download queue")
         self.queue_stack.addWidget(self.queue_empty)
         self.queue_stack.addWidget(self.queue_list)
@@ -415,58 +417,65 @@ class MusicVaultWindow(QMainWindow):
 
     def _apply_style(self) -> None:
         self.setStyleSheet("""
-            QMainWindow, QWidget#Root { background:#08090B; color:#F4F5F7; }
-            QWidget { color:#F4F5F7; font-family:'Segoe UI',Arial,sans-serif; font-size:10pt; }
-            QLabel#Brand { font-size:18pt; font-weight:750; letter-spacing:0.2px; color:#FFFFFF; }
-            QLabel#PageTitle { font-size:23pt; font-weight:720; color:#FFFFFF; }
-            QLabel#Eyebrow { color:#777F8A; font-size:8pt; font-weight:700; letter-spacing:1.1px; }
-            QLabel#Version, QLabel#Hint, QLabel#PathLabel, QLabel#Footer { color:#9299A4; }
-            QLabel#Footer { font-size:8pt; }
-            QLabel#LocalBadge { background:#111B16; color:#83D5A1; border:1px solid #254C35;
-                                border-radius:10px; padding:8px 11px; font-size:8pt; font-weight:700; }
-            QLabel#SectionTitle { font-size:12pt; font-weight:700; color:#F7F8FA; }
-            QLabel#QueueCount { color:#9BA3AD; font-size:8pt; font-weight:700; letter-spacing:0.8px; }
-            QLabel#EmptyState { color:#858D98; background:#0C0E12; border:1px dashed #303640;
-                                border-radius:10px; padding:22px; font-size:10pt; }
-            QLabel#FormatPill { background:#1A2028; border:1px solid #2C3542; color:#C7D0DD;
-                                border-radius:7px; padding:7px 3px; font-size:8pt; font-weight:700; }
-            QFrame#Card { background:#111419; border:1px solid #252C35; border-radius:14px; }
+            QMainWindow, QWidget#Root { background:#0A0C10; color:#F4F6F8; }
+            QWidget { color:#F4F6F8; font-family:'Segoe UI',Arial,sans-serif; font-size:10pt; }
+            QLabel#Brand { font-size:19pt; font-weight:750; letter-spacing:0.1px; color:#FFFFFF; }
+            QLabel#PageTitle { font-size:25pt; font-weight:740; letter-spacing:-0.4px; color:#FFFFFF; }
+            QLabel#Eyebrow { color:#A6B0BD; font-size:9pt; font-weight:700; letter-spacing:0.9px; }
+            QLabel#Version, QLabel#Hint, QLabel#PathLabel, QLabel#Footer { color:#A6B0BD; }
+            QLabel#Hint { font-size:10pt; }
+            QLabel#Footer { font-size:9pt; }
+            QLabel#LocalBadge { background:#142019; color:#B6EBCB; border:1px solid #31533E;
+                                border-radius:11px; padding:9px 12px; font-size:9pt; font-weight:700; }
+            QLabel#SectionTitle { font-size:13pt; font-weight:720; color:#F7F8FA; }
+            QLabel#QueueCount { color:#A6B0BD; font-size:9pt; font-weight:700; letter-spacing:0.7px; }
+            QLabel#EmptyState { color:#B5C0CE; background:#0E1218; border:1px dashed #394454;
+                                border-radius:14px; padding:24px; font-size:10pt; }
+            QLabel#FormatPill { background:#1B222C; border:1px solid #344050; color:#D3DBE5;
+                                border-radius:9px; padding:8px 5px; font-size:9pt; font-weight:700; }
+            QFrame#Card { background:#141820; border:1px solid #2B333F; border-radius:17px; }
             QLineEdit, QComboBox, QListWidget {
-                background:#0C0F14; border:1px solid #303945; border-radius:9px;
-                padding:10px 12px; color:#FFFFFF; selection-background-color:#364354;
+                background:#0E1218; border:1px solid #354050; border-radius:11px;
+                padding:11px 13px; color:#F4F6F8; selection-background-color:#364354;
             }
-            QLineEdit:focus, QComboBox:focus { border:1px solid #6B7D94; background:#10151D; }
-            QLineEdit::placeholder { color:#697381; }
-            QComboBox::drop-down { border:0; width:25px; }
-            QCheckBox { spacing:9px; color:#C6CBD3; }
-            QCheckBox::indicator { width:16px; height:16px; }
-            QCheckBox::indicator:unchecked { background:#0B0E13; border:1px solid #4B5664; border-radius:4px; }
-            QCheckBox::indicator:checked { background:#A8BCE0; border:1px solid #A8BCE0; border-radius:4px; }
-            QTabWidget::pane { border:1px solid #252C35; border-radius:13px; background:#111419; top:-1px; }
-            QTabBar::tab { background:#101318; color:#87909C; padding:11px 22px; margin-right:6px;
-                           border:1px solid #252C35; border-bottom:0; border-top-left-radius:9px;
-                           border-top-right-radius:9px; font-weight:650; }
-            QTabBar::tab:selected { color:#FFFFFF; background:#191E26; border-color:#374252; }
-            QTabBar::tab:hover:!selected { color:#D8DDE5; background:#171B21; }
-            QPushButton { border:0; border-radius:9px; padding:10px 15px; font-weight:650; }
-            QPushButton:hover { padding-top:9px; padding-bottom:11px; }
-            QPushButton:pressed { padding-top:11px; padding-bottom:9px; }
-            QPushButton:disabled { background:#252A31; color:#727B87; }
-            QPushButton#YoutubeButton { background:#D73535; color:#FFFFFF; }
-            QPushButton#YoutubeButton:hover { background:#EA4545; }
-            QPushButton#SpotifyButton { background:#168A47; color:#FFFFFF; }
-            QPushButton#SpotifyButton:hover { background:#1CA75A; }
-            QPushButton#SecondaryButton { background:#202731; color:#E2E7EE; border:1px solid #354151; }
-            QPushButton#SecondaryButton:hover { background:#293442; }
-            QPushButton#StopButton { background:#302022; color:#FFB3B3; border:1px solid #553236; }
-            QPushButton#TextButton { background:transparent; color:#9DA7B3; padding:6px 8px; }
-            QPushButton#TextButton:hover { color:#FFFFFF; background:#1B2028; }
-            QListWidget#QueueList { border:0; padding:4px; background:#0C0F14; }
-            QListWidget::item { padding:12px 10px; border-bottom:1px solid #242C36; }
-            QListWidget::item:selected { background:#242D39; border-radius:6px; }
-            QProgressBar { background:#242A33; border:0; border-radius:4px; height:8px; }
-            QProgressBar::chunk { background:#D73535; border-radius:4px; }
-            QStatusBar { color:#9299A4; background:#08090B; border-top:1px solid #20252D; }
+            QLineEdit:focus, QComboBox:focus { border:2px solid #899DB6; background:#111720; }
+            QLineEdit::placeholder { color:#9AA6B5; }
+            QComboBox::drop-down { border:0; width:28px; }
+            QCheckBox { spacing:10px; color:#E1E6ED; }
+            QCheckBox::indicator { width:19px; height:19px; }
+            QCheckBox::indicator:unchecked { background:#0E1218; border:1px solid #748194; border-radius:6px; }
+            QCheckBox::indicator:checked { background:#D5DFEC; border:1px solid #D5DFEC; border-radius:6px; }
+            QTabWidget#SourceTabs { background:transparent; }
+            QTabWidget#SourceTabs::pane { border:0; background:transparent; top:0; }
+            QTabWidget#SourceTabs::tab-bar { background:transparent; }
+            QTabBar { background:transparent; }
+            QTabBar::tab { min-width:112px; color:#B0BAC7; background:#161B23;
+                           padding:12px 22px; margin-right:8px; border:1px solid #303A47;
+                           border-radius:11px; font-weight:680; }
+            QTabBar::tab:selected { color:#FFFFFF; background:#32191E; border-color:#82434B; }
+            QTabBar::tab:hover:!selected { color:#F0F3F6; background:#222A35; }
+            QPushButton { color:#F4F6F8; border:1px solid transparent; border-radius:11px;
+                          padding:11px 16px; font-weight:700; min-height:40px; }
+            QPushButton:focus { border:2px solid #F4F6F8; }
+            QPushButton:hover { padding-top:10px; padding-bottom:12px; }
+            QPushButton:pressed { padding-top:12px; padding-bottom:10px; }
+            QPushButton:disabled { background:#242A33; color:#8C96A4; border-color:#303844; }
+            QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; border-color:#E74D56; }
+            QPushButton#YoutubeButton:hover { background:#EA454D; }
+            QPushButton#YoutubeButton:pressed { background:#BA2D36; }
+            QPushButton#SpotifyButton { background:#16864A; color:#FFFFFF; border-color:#29985B; }
+            QPushButton#SpotifyButton:hover { background:#1A9654; }
+            QPushButton#SecondaryButton { background:#222A35; color:#F0F3F6; border-color:#3B4655; }
+            QPushButton#SecondaryButton:hover { background:#2D3744; }
+            QPushButton#StopButton { background:#302022; color:#FFC0C0; border-color:#63373C; }
+            QPushButton#TextButton { background:transparent; color:#B8C2CE; padding:7px 9px; }
+            QPushButton#TextButton:hover { color:#FFFFFF; background:#202630; }
+            QListWidget#QueueList { border:0; padding:5px; background:#0E1218; }
+            QListWidget::item { padding:13px 11px; border-bottom:1px solid #29323E; }
+            QListWidget::item:selected { background:#242D39; border-radius:7px; }
+            QProgressBar { background:#252C36; border:0; border-radius:4px; height:8px; }
+            QProgressBar::chunk { background:#D93640; border-radius:4px; }
+            QStatusBar { color:#A6B0BD; background:#0A0C10; border-top:1px solid #252C36; }
         """)
 
     def _tab_changed(self, index: int) -> None:

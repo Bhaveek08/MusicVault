@@ -45,16 +45,24 @@ The mobile images are touch-first layouts rendered at 390 × 844. Native Android
 
 ## Install
 
-### Windows
+### Windows 10/11 (64-bit)
 
-Use the Windows installer from a trusted project release or the [Windows build workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/windows-build.yml). The installer is configured to:
+<a href="https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe"><strong>Download MusicVault for Windows</strong></a> — one installer, no artifact ZIP or Actions page required.
+
+1. Download `MusicVault-Setup.exe` from the link above.
+2. Open it and follow the per-user setup. The installer does not require administrator access.
+3. Launch MusicVault from the Start menu.
+
+If Windows shows an unknown-publisher message, the current installer is unsigned; only download it from this repository. If a release is not published yet, the [Windows build workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/windows-build.yml) is the temporary fallback. New version tags automatically publish the installer and portable ZIP to [GitHub Releases](https://github.com/Bhaveek08/MusicVault/releases); the download button above always points to the latest installer.
+
+The installer is configured to:
 
 - install per-user under `%LOCALAPPDATA%\Programs\MusicVault`;
 - create a Start Menu shortcut and offer an optional desktop shortcut;
 - keep preferences/logs and the media library outside the install directory;
 - uninstall the app without deleting user downloads.
 
-The installer is not code-signed; Windows may show an unknown-publisher warning until signing is configured.
+The installer is not code-signed; Windows may show an unknown-publisher warning until signing is configured. Each versioned release attaches the installer directly, so people can download one `.exe` from the Releases page.
 
 ### Linux x86_64
 

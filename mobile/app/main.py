@@ -276,44 +276,53 @@ class MusicVaultMobileWindow(QWidget):
 
     def _apply_style(self) -> None:
         self.setStyleSheet("""
-            QWidget#MobileRoot, QWidget#Page { background:#080808; color:#F5F5F5; }
-            QWidget { font-family:'Arial',sans-serif; font-size:14px; }
-            QLabel#Brand { color:#FFFFFF; font-size:19px; font-weight:700; }
-            QLabel#Eyebrow { color:#818181; font-size:9px; font-weight:700; letter-spacing:1px; }
-            QLabel#Mark { background:#171717; border:1px solid #333333; border-radius:12px;
+            QWidget#MobileRoot, QWidget#Page { background:#0B0D10; color:#F4F6F8; }
+            QWidget { color:#F4F6F8; font-family:'Segoe UI',Arial,sans-serif; font-size:14px; }
+            QScrollArea, QScrollArea > QWidget > QWidget { background:#0B0D10; border:0; }
+            QLabel#Brand { color:#FFFFFF; font-size:19px; font-weight:740; }
+            QLabel#Eyebrow { color:#A6B0BD; font-size:11px; font-weight:700; letter-spacing:1px; }
+            QLabel#Mark { background:#202630; border:1px solid #37404D; border-radius:14px;
                           color:#FFFFFF; font-weight:800; font-size:15px; }
-            QLabel#PreviewBadge { background:#171717; border:1px solid #303030; border-radius:9px;
-                                  color:#AAAAAA; padding:6px 9px; font-size:9px; font-weight:700; }
-            QLabel#EmptyState { color:#777F8A; background:#0A0B0D; border:1px dashed #303030;
-                                border-radius:10px; padding:16px; font-size:12px; }
-            QLabel#Hero { font-size:26px; font-weight:750; color:#FFFFFF; }
-            QLabel#Hint { color:#999999; font-size:12px; }
-            QLabel#CardTitle { color:#F7F7F7; font-size:17px; font-weight:700; }
-            QLabel#Footer { color:#707070; font-size:10px; padding:5px 2px; }
-            QFrame#Card { background:#121212; border:1px solid #292929; border-radius:16px; }
+            QLabel#PreviewBadge { background:#191E26; border:1px solid #3A4553; border-radius:10px;
+                                  color:#C0C8D2; padding:7px 10px; font-size:11px; font-weight:700; }
+            QLabel#EmptyState { color:#A6B0BD; background:#0F1217; border:1px dashed #3A4553;
+                                border-radius:12px; padding:16px; font-size:13px; }
+            QLabel#Hero { color:#FFFFFF; font-size:29px; font-weight:760; }
+            QLabel#Hint { color:#A6B0BD; font-size:13px; }
+            QLabel#CardTitle { color:#F7F8FA; font-size:19px; font-weight:720; }
+            QLabel#Footer { color:#A6B0BD; font-size:11px; padding:7px 2px; }
+            QFrame#Card { background:#14181F; border:1px solid #2A313C; border-radius:16px; }
             QLineEdit, QComboBox, QListWidget#Queue {
-                background:#0A0A0A; border:1px solid #333333; border-radius:10px;
-                padding:12px; color:#FFFFFF; selection-background-color:#343434;
+                background:#0F1217; border:1px solid #3A4553; border-radius:11px;
+                padding:12px; color:#F4F6F8; selection-background-color:#364354;
             }
-            QLineEdit:focus, QComboBox:focus { border:1px solid #777777; }
-            QComboBox::drop-down { border:0; width:22px; }
-            QCheckBox { color:#C8C8C8; spacing:9px; font-size:12px; }
-            QCheckBox::indicator { width:17px; height:17px; }
-            QPushButton { min-height:42px; border-radius:11px; font-size:13px; font-weight:700; padding:8px 13px; }
-            QPushButton#YoutubeTab { background:#171717; color:#AAAAAA; border:1px solid #303030; }
-            QPushButton#SpotifyTab { background:#171717; color:#AAAAAA; border:1px solid #303030; }
-            QPushButton#YoutubeTab[active="true"] { background:#2A1717; color:#FF7777; border:1px solid #743333; }
-            QPushButton#SpotifyTab[active="true"] { background:#132519; color:#58D487; border:1px solid #2E7045; }
-            QPushButton#YoutubeButton { background:#D73535; color:white; border:1px solid #E64B4B; }
-            QPushButton#YoutubeButton:hover { background:#E54545; }
-            QPushButton#YoutubeButton:pressed { background:#B82424; }
-            QPushButton#SpotifyButton { background:#168A47; color:white; border:1px solid #229D57; }
-            QPushButton#SpotifyButton:hover { background:#1AA354; }
-            QPushButton#SpotifyButton:pressed { background:#116B35; }
-            QPushButton#SecondaryButton { background:#20252D; color:#DFE5ED; border:1px solid #353D48; }
-            QPushButton#SecondaryButton:hover { background:#2A323D; }
-            QListWidget#Queue { border:0; padding:3px; }
-            QListWidget::item { padding:9px 5px; border-bottom:1px solid #222222; }
+            QLineEdit:focus, QComboBox:focus { border:2px solid #8EA0B7; }
+            QLineEdit::placeholder { color:#A6B0BD; }
+            QComboBox::drop-down { border:0; width:26px; }
+            QCheckBox { color:#E2E6EB; spacing:10px; font-size:13px; }
+            QCheckBox::indicator { width:20px; height:20px; }
+            QCheckBox::indicator:unchecked { background:#0F1217; border:1px solid #718092; border-radius:6px; }
+            QCheckBox::indicator:checked { background:#D0DBEA; border:1px solid #D0DBEA; border-radius:6px; }
+            QPushButton { min-height:46px; border-radius:11px; font-size:14px; font-weight:700; padding:9px 14px; }
+            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }\n            QPushButton#YoutubeButton:focus, QPushButton#SpotifyButton:focus, QPushButton#SecondaryButton:focus,\n            QPushButton#StopButton:focus, QPushButton#TextButton:focus, QPushButton#YoutubeTab:focus,\n            QPushButton#SpotifyTab:focus { border:2px solid #F4F6F8; }
+            QPushButton#YoutubeTab, QPushButton#SpotifyTab {
+                background:#191E26; color:#C0C8D2; border:1px solid #3A4553;
+            }
+            QPushButton#YoutubeTab[active="true"] { background:#32191D; color:#FFB0B4; border:1px solid #744047; }
+            QPushButton#SpotifyTab[active="true"] { background:#14291F; color:#9CE8B9; border:1px solid #356B4B; }
+            QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; border:1px solid #E74D56; }
+            QPushButton#YoutubeButton:hover { background:#EA454D; }
+            QPushButton#YoutubeButton:pressed { background:#B82C35; }
+            QPushButton#SpotifyButton { background:#16864A; color:#FFFFFF; border:1px solid #29985B; }
+            QPushButton#SpotifyButton:hover { background:#1A9654; }
+            QPushButton#SpotifyButton:pressed { background:#116C3B; }
+            QPushButton#SecondaryButton { background:#222832; color:#F0F2F5; border:1px solid #3A4553; }
+            QPushButton#SecondaryButton:hover { background:#2B333F; }
+            QListWidget#Queue { border:0; padding:4px; }
+            QListWidget::item { padding:11px 7px; border-bottom:1px solid #2A313C; }
+            QScrollBar:vertical { width:8px; background:#0F1217; margin:4px 0; }
+            QScrollBar::handle:vertical { min-height:24px; background:#465160; border-radius:4px; }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height:0; }
         """)
 
 
