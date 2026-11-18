@@ -40,33 +40,41 @@ jobs:
       - name: Build debug APK
         working-directory: mobile/android
         run: gradle --no-daemon --stacktrace assembleDebug
-      - name: Run APK on Android emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          profile: pixel_6
-          disable-animations: true
-          script: |
-            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -n com.musicvault.mobile/.MainActivity
-            sleep 8
-            adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
-            mkdir -p artifacts
-            adb exec-out screencap -p > artifacts/android-emulator.png
-      - name: Prepare Android source bundle
+      - name: Prepare Android APK and source bundle
         run: |
           mkdir -p dist
           cp mobile/android/app/build/outputs/apk/debug/app-debug.apk dist/MusicVault-Android-debug.apk
           zip -qr dist/MusicVault-Android-source.zip mobile/android mobile/shared
-          cp artifacts/android-emulator.png dist/
       - name: Upload Android test package
         uses: actions/upload-artifact@v4
         with:
           name: MusicVault-Android-test-build
           path: dist/*
           if-no-files-found: error
+          retention-days: 30
+      - name: Run APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -no-audio -no-boot-anim -camera-back none
+          script: |
+            adb install -r mobile/android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n com.musicvault.mobile/.MainActivity
+            sleep 5
+            adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
+            mkdir -p artifacts
+            adb exec-out screencap -p > artifacts/android-emulator.png
+      - name: Upload Android emulator screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MusicVault-Android-emulator-verification
+          path: artifacts/android-emulator.png
+          if-no-files-found: ignore
           retention-days: 30
 
   ios:
@@ -78,7 +86,14 @@ jobs:
         run: xcodebuild -version
       - name: Build iOS Simulator app
         run: |
-          xcodebuild             -project mobile/ios/MusicVault.xcodeproj             -scheme MusicVault             -sdk iphonesimulator             -destination 'generic/platform=iOS Simulator'             -derivedDataPath "$RUNNER_TEMP/MusicVault-iOS"             CODE_SIGNING_ALLOWED=NO             build
+          xcodebuild \
+            -project mobile/ios/MusicVault.xcodeproj \
+            -scheme MusicVault \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/MusicVault-iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
       - name: Install and launch on an iOS Simulator
         run: |
           DEVICE_ID="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for group in d["devices"].values() for x in group if x.get("isAvailable") and x["name"].startswith("iPhone")) )')"
