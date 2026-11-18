@@ -7,7 +7,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -29,12 +29,25 @@ jobs:
         run: |
           set CI=1
           scripts\build_windows.bat
-      - name: Upload installer and notices
+      - name: Package Windows release ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/MusicVault-Setup.exe, THIRD_PARTY_NOTICES.txt, QA_REPORT.md `-DestinationPath dist/MusicVault-Windows-x64.zip -CompressionLevel Optimal -Force
+      - name: Publish GitHub release for version tags
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          gh release create $tag dist/MusicVault-Setup.exe dist/MusicVault-Windows-x64.zip THIRD_PARTY_NOTICES.txt QA_REPORT.md --title "MusicVault $tag" --generate-notes --verify-tag
+      - name: Upload installer, ZIP and notices
         uses: actions/upload-artifact@v4
         with:
           name: musicvault-windows-x64
           path: |
             dist/MusicVault-Setup.exe
+            dist/MusicVault-Windows-x64.zip
             THIRD_PARTY_NOTICES.txt
             QA_REPORT.md
           if-no-files-found: error
