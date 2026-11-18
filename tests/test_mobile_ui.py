@@ -1,10 +1,16 @@
 import os
+import sys
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 from PySide6.QtWidgets import QApplication
 
 from mobile.app.main import MusicVaultMobileWindow, validate_spotify_link, validate_youtube_link
+
+requires_qt_gui = pytest.mark.skipif(
+    sys.platform == "darwin",
+    reason="Qt 6.12 offscreen Widgets backend crashes at interpreter shutdown on the current macOS CI runner; run these widget tests on Linux/Windows and iOS via the native Xcode path.",
+)
 
 
 @pytest.fixture(scope="session")
@@ -13,6 +19,7 @@ def app():
     yield instance
 
 
+@requires_qt_gui
 def test_mobile_preview_renders_at_phone_size(app):
     window = MusicVaultMobileWindow()
     window.resize(390, 844)
@@ -25,6 +32,7 @@ def test_mobile_preview_renders_at_phone_size(app):
     window.close()
 
 
+@requires_qt_gui
 def test_source_tabs_switch_without_rebuilding_widgets(app):
     window = MusicVaultMobileWindow()
     window.set_source("spotify")
@@ -69,6 +77,7 @@ def test_mobile_spotify_rejects_lookalike_hosts():
         validate_spotify_link("https://spotify.com.evil.example/track/123")
 
 
+@requires_qt_gui
 def test_youtube_queue_is_explicitly_preview_only(app):
     window = MusicVaultMobileWindow()
     window.youtube_input.setText("https://youtu.be/BaW_jenozKc")
@@ -79,6 +88,7 @@ def test_youtube_queue_is_explicitly_preview_only(app):
     window.close()
 
 
+@requires_qt_gui
 def test_playlist_requires_playlist_toggle(app):
     window = MusicVaultMobileWindow()
     window.youtube_input.setText("https://www.youtube.com/playlist?list=PL1234567890")
