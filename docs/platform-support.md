@@ -19,13 +19,13 @@ macOS uses a native `.app` bundle and DMG for Apple Silicon. The build creates a
 
 ## Mobile prototype scope
 
-The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side Qt tests render at phone-sized dimensions, exercise YouTube/Spotify tab switching, and test basic safe-link acceptance/rejection. Those tests run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
+The `mobile/` directory contains a touch-first PySide6 UI prototype and URL validation. Host-side tests cover YouTube/Spotify URL validation and static UI structure checks. They do not instantiate or render the Qt Widgets UI because Qt 6.12's offscreen backend crashed at shutdown on the available CI runners. These tests run on desktop CI hosts; they do not execute on an Android device or iOS simulator.
 
 The mobile UI's preview queue is local UI state only. It does not download media. The desktop downloader currently uses yt-dlp/yt-dlp-ejs, Deno, and FFmpeg. Those are not drop-in mobile dependencies:
 
 - Qt's iOS deploy tool generates an Xcode project using platform-specific PySide6/Shiboken wheels and a Python.xcframework. The tool documentation states that third-party packages are not automatically supported; packages with C extensions need target-specific cross-compilation and app-bundle integration.
 - iOS requires sandbox-compliant file access, native sharing/export handling, app lifecycle/background-task design, privacy-purpose strings, provisioning, and App Store review.
-- Android uses Qt for Python's Android deploy tool, platform-specific wheels, the Android SDK/NDK, and Buildozer. A successful package build still needs emulator/physical-device lifecycle, storage, permission, and network tests.
+- Android's arm64 PySide6/Shiboken wheels can be fetched with qtpip. The deploy attempt was blocked by the Qt deploy tool's license-credential gate in CI, so no APK/AAB has been created. A package build still needs Android SDK/NDK setup plus emulator/physical-device lifecycle, storage, permission, and network tests.
 
 The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
