@@ -43,7 +43,7 @@ The Mobile UI workflow generates four PNGs from the real Qt widgets, using the c
 - Mobile YouTube prototype — 390 × 844
 - Mobile Spotify prototype — 390 × 844
 
-Open the latest [Mobile UI workflow run](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) and download the `musicvault-ui-previews` artifact. These are host-rendered app screenshots, not device screenshots.
+Open the latest [Mobile UI workflow run](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) and download the `musicvault-ui-previews` artifact. These are actual Qt widget renders created under a virtual X11 desktop. They are not Android/iOS device screenshots.
 
 ## Current native build blockers
 
