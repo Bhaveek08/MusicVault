@@ -16,10 +16,10 @@ SPOTIFY_TYPES = {"track", "album", "artist", "playlist", "show", "episode"}
 def _parse_official_https_url(value: str, allowed_hosts: set[str], provider: str):
     if not isinstance(value, str) or not value.strip() or len(value) > 2048:
         raise ValueError(f"Paste a valid {provider} link.")
-    # Reject controls before trimming: urlsplit() silently strips CR/LF and TAB.
-    if any(ord(char) < 32 or ord(char) == 127 for char in value):
-        raise ValueError(f"The {provider} link contains control characters.")
+    # Trim clipboard whitespace, then reject control characters embedded inside the URL.
     candidate = value.strip()
+    if any(ord(char) < 32 or ord(char) == 127 for char in candidate):
+        raise ValueError(f"The {provider} link contains control characters.")
     try:
         parsed = urlsplit(candidate)
         host = (parsed.hostname or "").lower().rstrip(".")
