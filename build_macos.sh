@@ -27,13 +27,26 @@ python -m PyInstaller --noconfirm --clean --onedir --windowed \
   --add-data "assets/musicvault-icon.png:assets" \
   --add-data "assets/musicvault.icns:assets" \
   --add-binary "vendor/deno:." \
-  --collect-all PySide6 \
   --collect-all shiboken6 \
   --collect-all yt_dlp \
   --collect-all yt_dlp_ejs \
   --collect-all imageio_ffmpeg \
   --hidden-import yt_dlp_ejs \
   musicvault_app.py
+
+
+# This release targets Apple Silicon only. Strip the unused x86_64 slice from
+# universal2 Qt and helper binaries to avoid shipping a second architecture.
+echo "Thinning universal binaries to Apple Silicon arm64..."
+while IFS= read -r -d '' binary; do
+  architectures="$(lipo -archs "$binary" 2>/dev/null || true)"
+  if [[ " $architectures " == *" arm64 "* && " $architectures " == *" x86_64 "* ]]; then
+    temporary="${binary}.arm64"
+    lipo "$binary" -thin arm64 -output "$temporary"
+    chmod "$(stat -f '%Lp' "$binary")" "$temporary"
+    mv "$temporary" "$binary"
+  fi
+done < <(find dist/MusicVault.app/Contents -type f -print0)
 
 APP_BIN="dist/MusicVault.app/Contents/MacOS/MusicVault"
 if [[ ! -x "$APP_BIN" ]]; then
