@@ -154,6 +154,27 @@ def test_spotify_tab_and_open_link_action(window, monkeypatch, warnings):
     assert warnings and "official Spotify" in warnings[-1]
 
 
+def test_spotify_tab_shows_offline_help_instead_of_export_controls(window, monkeypatch):
+    assert window.queue_card.isVisible()
+    assert window.formats_card.isVisible()
+    assert not window.spotify_info_card.isVisible()
+
+    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
+    QApplication.processEvents()
+    assert not window.queue_card.isVisible()
+    assert not window.formats_card.isVisible()
+    assert window.spotify_info_card.isVisible()
+
+    opened = []
+    monkeypatch.setattr(
+        musicvault_app.QDesktopServices,
+        "openUrl",
+        lambda url: opened.append(url.toString()) or True,
+    )
+    click_button(window, "Spotify offline guide")
+    assert opened == ["https://support.spotify.com/us/article/listen-offline/"]
+
+
 def test_spotify_open_failure_shows_recoverable_error(window, monkeypatch, warnings):
     window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
     QApplication.processEvents()

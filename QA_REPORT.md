@@ -1,14 +1,14 @@
-# MusicVault 2.0.4 — QA report
+# MusicVault 2.0.5 — QA report
 
 ## Release downloads
 
-The [v2.0.4 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.4) provides direct desktop downloads:
+The [v2.0.5 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.5) provides direct desktop downloads:
 
 | Platform | Asset | Verification | Distribution caveat |
 | --- | --- | --- | --- |
-| Windows 10/11 x64 | [`MusicVault-Setup.exe`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe) and portable ZIP | Tagged Windows build, packaged smoke test, and Inno Setup compilation passed in [run 44489750371](https://github.com/Bhaveek08/MusicVault/actions/runs/44489750371). | Installer is unsigned. |
-| macOS Apple Silicon | [`MusicVault-macos-arm64.dmg`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-macos-arm64.dmg) | App-bundle smoke test and DMG creation passed in [run 44489750302](https://github.com/Bhaveek08/MusicVault/actions/runs/44489750302). | Unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
-| Linux x86_64 | [`MusicVault-Linux-x86_64.tar.gz`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) | Portable build and packaged GUI smoke test passed in [run 44489750317](https://github.com/Bhaveek08/MusicVault/actions/runs/44489750317). | Host Qt/X11 runtime libraries are required. |
+| Windows 10/11 x64 | [`MusicVault-Setup.exe`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe) and portable ZIP | v2.0.5 tagged build verification will be recorded after release workflows complete. | Installer is unsigned. |
+| macOS Apple Silicon | [`MusicVault-macos-arm64.dmg`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-macos-arm64.dmg) | v2.0.5 tagged build verification will be recorded after release workflows complete. | Unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
+| Linux x86_64 | [`MusicVault-Linux-x86_64.tar.gz`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) | v2.0.5 tagged build verification will be recorded after release workflows complete. | Host Qt/X11 runtime libraries are required. |
 | Android | No production release asset | Debug APK installed and the Downloads page rendered on an Android 15/API 35 emulator in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed AAB, or Play Store build. |
 | iOS/iPadOS | No device-installable release asset | Simulator app built, installed, and launched in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed device IPA, TestFlight, or App Store build. |
 
@@ -16,9 +16,9 @@ The mobile clients validate links, stage a local preview queue, and hand officia
 
 ## Regression and security checks
 
-For the v2.0.4 source, all 86 pytest cases passed locally, the release QA runner passed 50 consecutive runs on Windows, and the six-job [CI run 44489381079](https://github.com/Bhaveek08/MusicVault/actions/runs/44489381079) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. The [CodeQL run 44489380974](https://github.com/Bhaveek08/MusicVault/actions/runs/44489380974) passed.
+For the v2.0.5 source, all 87 pytest cases passed locally; the 50-pass QA run and remote CI are running for the release candidate. The previous v2.0.4 six-job [CI run 44489381079](https://github.com/Bhaveek08/MusicVault/actions/runs/44489381079) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. The [CodeQL run 44489380974](https://github.com/Bhaveek08/MusicVault/actions/runs/44489380974) passed for v2.0.4.
 
-The [Mobile UI run 44489381095](https://github.com/Bhaveek08/MusicVault/actions/runs/44489381095) passed source-policy checks, shared WebView button/error interaction checks on Windows and Ubuntu, target-readiness checks, and rendered UI previews. Current desktop previews show the visible app window at 1200 × 900; mobile previews are touch-first at 390 × 844. Android and iOS native clients remain prototypes, as described above.
+The [Mobile UI run 44489381095](https://github.com/Bhaveek08/MusicVault/actions/runs/44489381095) passed source-policy checks, shared WebView button/error interaction checks on Windows and Ubuntu, target-readiness checks, and rendered UI previews for v2.0.4. Current desktop previews show the visible app window at 1200 × 900; mobile previews are touch-first at 390 × 844. Android and iOS native clients remain prototypes, as described above.
 
 Test coverage includes strict YouTube and Spotify URL handling, permission and playlist gating, invalid-input errors, clipboard success/failure, folder selection and cancellation, queue capacity and clearing, progress/failure states, download/stop control wiring, authorized-storefront link actions, minimum-height button/card geometry, non-overlapping columns, long-path elision, format selection, output-folder validation, and downloader option constraints. The shared mobile UI tests cover all seven interactive controls and recoverable error cases.
 

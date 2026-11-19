@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.5 — 2026-11-19
+
+- Refresh the full desktop experience with a library hero, balanced source tabs, richer surface colors, and consistent focus/hover states.
+- Make the Spotify view contextual: hide file-export controls there and show Spotify's official offline-listening guide instead.
+- Improve the desktop UI previews and cover the contextual Spotify controls in interaction tests.
+
 ## 2.0.4 — 2026-11-19
 
 - Refresh the desktop interface with stronger hierarchy, calmer surfaces, more generous spacing, and a higher minimum window height to prevent clipping.

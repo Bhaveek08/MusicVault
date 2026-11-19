@@ -13,7 +13,7 @@ MusicVault provides a single desktop window for managing permitted YouTube media
 - **Spotify:** validate and open official track, album, artist, or playlist links. Spotify playback and offline listening stay in Spotify; the app links to Bandcamp and to SoundCloud tracks whose artists enable downloads.
 - **Formats:** MP3, WAV, FLAC, M4A, AAC, OPUS, and MKV. Lossy audio exports target 320 kbps where supported; source quality remains the limit.
 - **Workflow:** playlist opt-in, queue management, progress, cancellation, remembered output folder, and collision-safe filenames.
-- **Interface:** black-first theme, YouTube red and Spotify green accents, lightweight button feedback, and animated progress.
+- **Interface:** a spacious midnight dashboard, source-aware panels, YouTube red and Spotify green accents, responsive focus/hover states, and animated progress.
 
 MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions, browser sessions, or platform access controls.
 
