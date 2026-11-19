@@ -53,6 +53,8 @@ Choose your desktop installer below. Android and iOS currently have UI prototype
 | macOS Apple Silicon | [Disk image (.dmg)](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-macos-arm64.dmg) |
 | Linux x86_64 | [Portable archive (.tar.gz)](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) |
 
+[SHA-256 checksums](https://github.com/Bhaveek08/MusicVault/releases/latest/download/SHA256SUMS.txt) are available for the release binaries.
+
 ### Windows 10/11 (64-bit)
 
 <a href="https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe"><strong>Download MusicVault for Windows</strong></a> — one installer, no artifact ZIP or Actions page required.

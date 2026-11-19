@@ -1,49 +1,32 @@
-# MusicVault 2.0.2 — QA report
+# MusicVault 2.0.3 — QA report
 
-## Release artifacts
+## Release downloads
 
-The public [v2.0.2 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.2) contains:
+The [v2.0.3 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.3) provides direct desktop downloads:
 
 | Platform | Asset | Verification | Distribution caveat |
 | --- | --- | --- | --- |
-| Windows 10/11 x64 | `MusicVault-Setup.exe`, `MusicVault-Windows-x64.zip` | Windows build, packaged `--smoke-test`, and installer compilation passed in [release workflow 44415036837](https://github.com/Bhaveek08/MusicVault/actions/runs/44415036837). | Installer is unsigned. |
-| macOS Apple Silicon | `MusicVault-macos-arm64.dmg` | App-bundle smoke test and DMG creation passed in [macOS workflow 44415984028](https://github.com/Bhaveek08/MusicVault/actions/runs/44415984028). | DMG is unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
-| Android | No production release asset; CI debug APK available as a 30-day artifact | APK installed and Downloads UI rendered on Android 15/API 35 emulator in [mobile build run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433). | Preview UI only; no download engine, signed AAB, or Play Store build. |
-| iOS/iPadOS | No device-installable release asset; CI Simulator app available as a 30-day artifact | Simulator app built, installed, and launched in [mobile build run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433). | Preview UI only; no download engine, device IPA, TestFlight, or App Store build. |
+| Windows 10/11 x64 | [`MusicVault-Setup.exe`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe) and portable ZIP | Tagged Windows build, packaged smoke test, and Inno Setup compilation passed in [run 44479710634](https://github.com/Bhaveek08/MusicVault/actions/runs/44479710634). | Installer is unsigned. |
+| macOS Apple Silicon | [`MusicVault-macos-arm64.dmg`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-macos-arm64.dmg) | App-bundle smoke test and DMG creation passed in [run 44479710360](https://github.com/Bhaveek08/MusicVault/actions/runs/44479710360). | Unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
+| Linux x86_64 | [`MusicVault-Linux-x86_64.tar.gz`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) | Portable build and packaged GUI smoke test passed in [run 44479710502](https://github.com/Bhaveek08/MusicVault/actions/runs/44479710502). | Host Qt/X11 runtime libraries are required. |
+| Android | No production release asset | Debug APK installed and the Downloads page rendered on an Android 15/API 35 emulator in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed AAB, or Play Store build. |
+| iOS/iPadOS | No device-installable release asset | Simulator app built, installed, and launched in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed device IPA, TestFlight, or App Store build. |
 
-The Windows release job and macOS package job are independent. The macOS DMG was attached after its successful build. Release assets are not code-signed by the current pipelines.
+The mobile clients validate links, stage a local preview queue, and hand official Spotify links to Spotify. Mobile downloading is intentionally disabled until a source authorization pathway, platform-compatible engine, sandbox file export, lifecycle behavior, signing, and store review are resolved. Emulator and Simulator checks are not physical-device tests.
 
-## Automated regression matrix
+## Regression and security checks
 
-Commit [`7dfc8e4`](https://github.com/Bhaveek08/MusicVault/commit/7dfc8e4e6339898726c08194cb2396a0f907ff81) passed the six-job [CI run 44417329152](https://github.com/Bhaveek08/MusicVault/actions/runs/44417329152) and [CodeQL run 44417329198](https://github.com/Bhaveek08/MusicVault/actions/runs/44417329198):
+The six-job [CI run 44478916414](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916414) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. The suite contains 85 pytest cases and ran for 50 repetitions per job. A separate local Windows QA run also passed 50 consecutive repetitions. The [CodeQL run 44478916468](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916468) passed.
 
-| Runner | Python | Full-suite repetitions | Result |
-| --- | --- | ---: | --- |
-| Windows latest | 3.11 | 50 | Passed |
-| Windows latest | 3.13 | 50 | Passed |
-| Ubuntu latest | 3.11 | 50 | Passed |
-| Ubuntu latest | 3.13 | 50 | Passed |
-| macOS 15 | 3.11 | 50 | Passed |
-| macOS 15 | 3.13 | 50 | Passed |
+The [Mobile UI run 44478916403](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916403) passed source-policy checks, shared WebView button/error interaction checks on Windows and Ubuntu, target-readiness checks, and rendered current UI previews. The desktop screenshots show the visible app window at 1200 × 820; mobile previews are touch-first at 390 × 844.
 
-The suite contains 77 pytest cases, including parameterized cases. CI therefore ran 300 complete suite repetitions (23,100 passing test-case executions). These are repeats of the same deterministic tests, not independent test plans or physical-device trials. The desktop Qt test harness explicitly closes and destroys its windows to avoid a PySide process-exit crash.
+Test coverage includes strict YouTube and Spotify URL handling, permission and playlist gating, invalid-input errors, clipboard success/failure, folder selection and cancellation, queue capacity and clearing, progress/failure states, download/stop control wiring, button geometry, non-overlapping columns, long-path elision, format selection, output-folder validation, and downloader option constraints. The shared mobile UI tests cover all seven interactive controls and recoverable error cases.
 
-## What the tests cover
+## Limits
 
-- Safe YouTube video/playlist and Spotify URL acceptance and rejection.
-- Queue permission gating, invalid URL errors, playlist-only handling, valid queue add, completion clearing, queue counts, progress, and failed-job state.
-- Spotify tab handoff, valid link opening, invalid-link errors, and open failure recovery.
-- Visible desktop button geometry at the configured minimum window size and supported format choices.
-- Output folder validation, output option construction, format mapping, helper formatting, and app identity.
-- Download option constraints that disable cookies, plugins, and remote components.
-- Shared Android/iOS WebView UI: all seven buttons have click handlers; YouTube and Spotify tab switching, paste success/failure, permission and playlist gating, invalid links, queue rendering/cap/clear, and Spotify handoff are exercised by the Node interaction suite.
-
-## Platform and security boundaries
-
-- The desktop app downloads only public YouTube sources accepted by its URL policy and requires the user to confirm they own or may save the content. It does not read browser cookies or export protected Spotify streams.
-- The automated tests do not perform live media downloads, decode every output format, test installer upgrades/uninstalls on physical devices, or prove every screenreader, DPI, theme, and keyboard path.
-- The Android and iOS UIs remain prototypes. Their appearance or host-side validation does not prove native download, background-task, storage, lifecycle, signing, or store behavior.
-- No client application can be made cheat-engine-proof. Obfuscation can raise reverse-engineering effort but cannot secure logic running on a user's device.
-- Windows and macOS binaries are currently unsigned; macOS also lacks notarization. Public deployment should add trusted signing/notarization and verify downloaded checksums.
-- No test suite proves that software has zero defects.
-- Android and iOS UI shells have native simulator/emulator launch evidence, but they are not complete mobile downloaders and have not been validated on physical devices.
+- No live media download was tested. Tests do not decode every format, exercise installer upgrade/uninstall on physical systems, or prove every DPI, accessibility, keyboard, and screen-reader path.
+- MusicVault does not bypass DRM, private or account-gated content, or browser sessions. A checkbox does not replace service authorization or rights-holder permission.
+- Android and iOS are not functional media downloaders or store-ready products. The mobile queue is preview-only.
+- Windows and macOS installers are unsigned; macOS is also not notarized. Public distribution may show OS trust warnings.
+- No client app can be made cheat-engine-proof. Open-source code can be inspected and modified; obfuscation cannot protect logic running on a user's device.
+- A green test suite is evidence for the tested paths, not proof of zero defects or physical-device compatibility.

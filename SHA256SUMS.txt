@@ -1,0 +1,4 @@
+1cb36436b4655a09742e794bab4931db0bc8e290532e8352069533bc6fcb942b  MusicVault-Setup.exe
+313c3b0e1471fe0725fdb35ee0b5110285eae5a766444f08eacaa30c133e3779  MusicVault-Windows-x64.zip
+a1b080e0199a470c355fa040bc2e620141376549b979ad932abb195a49bfc5c8  MusicVault-Linux-x86_64.tar.gz
+6e7a79a72beda4aafad07f48a60d21693ddd4f3219736ecaf139e3be4ec40ca8  MusicVault-macos-arm64.dmg
