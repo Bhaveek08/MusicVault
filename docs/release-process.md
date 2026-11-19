@@ -23,7 +23,7 @@ On a clean Windows 10/11 x64 machine:
 - [ ] Check Start Menu and optional desktop shortcuts.
 - [ ] Upgrade an earlier install and verify the install directory does not accumulate stale binaries.
 - [ ] Uninstall and confirm program files/shortcuts are removed while user downloads and preferences are preserved.
-- [ ] Exercise URL validation, YouTube and Spotify tabs, format selection, folder selection, queue addition/removal, cancellation, and clean exit.
+- [ ] Exercise URL validation, single-source YouTube input, format selection, folder selection, queue addition/removal, cancellation, and clean exit.
 - [ ] Test permitted public sample media only where platform rules and rights allow.
 - [ ] Scan the installer and record SHA-256. Verify signing status; never claim a signature unless verified.
 

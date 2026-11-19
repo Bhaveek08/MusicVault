@@ -4,7 +4,7 @@ import pytest
 from musicvault_core import (
     APP_NAME, APP_VERSION, SourceValidationError, UnsupportedServiceError,
     build_ydl_options, format_bytes, format_eta, get_app_data_dir,
-    validate_output_folder, validate_source_url, validate_spotify_url,
+    validate_output_folder, validate_source_url,
 )
 
 
@@ -40,27 +40,6 @@ def test_rejects_unsafe_youtube_urls(url):
 def test_spotify_is_not_a_download_source():
     with pytest.raises(UnsupportedServiceError):
         validate_source_url("https://open.spotify.com/track/1234567890123456789012")
-
-
-@pytest.mark.parametrize("url", [
-    "https://open.spotify.com/track/1234567890123456789012",
-    "https://open.spotify.com/album/1234567890123456789012",
-    "https://open.spotify.com/playlist/1234567890123456789012",
-    "https://spotify.link/AbCdEf",
-])
-def test_valid_spotify_handoff_links(url):
-    assert validate_spotify_url(url).startswith("https://")
-
-
-@pytest.mark.parametrize("url", [
-    "http://open.spotify.com/track/1234567890123456789012",
-    "https://spotify.com.evil.example/track/1234567890123456789012",
-    "https://evil.example/track/1234567890123456789012",
-    "https://user:pass@open.spotify.com/track/1234567890123456789012",
-])
-def test_rejects_unsafe_spotify_links(url):
-    with pytest.raises(SourceValidationError):
-        validate_spotify_url(url)
 
 
 def test_app_data_dir_is_per_user(tmp_path):
@@ -107,4 +86,4 @@ def test_format_helpers_handle_invalid_values():
 
 def test_version_identity():
     assert APP_NAME == "MusicVault"
-    assert APP_VERSION == "2.0.5"
+    assert APP_VERSION == "2.0.6"

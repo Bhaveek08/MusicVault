@@ -1,6 +1,6 @@
 # iOS app
 
-This folder contains a native SwiftUI/WKWebView shell. The UI assets are bundled locally from mobile/shared/; external navigation is restricted to official Spotify HTTPS links.
+This folder contains a native SwiftUI/WKWebView shell. The UI assets are bundled locally from mobile/shared/; external navigation is blocked.
 
 ## Build for iOS Simulator
 
@@ -22,4 +22,4 @@ The simulator build cannot be installed on a physical device. Open MusicVault.xc
 
 ## Current scope
 
-This is an installable UI test build. YouTube links can be validated and queued as previews. Media downloading is not connected to iOS yet. Spotify links are handed off to Spotify. The app uses local bundled assets and allows external navigation only to official Spotify HTTPS hosts.
+This is an installable UI test build. YouTube links can be validated and queued as previews. Media downloading is not connected to iOS yet. The app uses local bundled assets and blocks external navigation.

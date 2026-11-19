@@ -40,10 +40,6 @@ struct MusicVaultView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {}
 
     final class Coordinator: NSObject, WKNavigationDelegate {
-        private let allowedHosts: Set<String> = [
-            "open.spotify.com", "www.spotify.com", "spotify.com", "spotify.link"
-        ]
-
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             guard let url = navigationAction.request.url else {
@@ -53,13 +49,6 @@ struct MusicVaultView: UIViewRepresentable {
             if url.isFileURL {
                 decisionHandler(.allow)
                 return
-            }
-            let safeHost = (url.host ?? "").lowercased()
-            if url.scheme?.lowercased() == "https",
-               allowedHosts.contains(safeHost),
-               url.user == nil, url.password == nil,
-               url.port == nil || url.port == 443 {
-                UIApplication.shared.open(url)
             }
             decisionHandler(.cancel)
         }

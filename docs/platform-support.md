@@ -28,7 +28,7 @@ Automated URL-policy tests run on desktop CI hosts. Real Qt prototype screenshot
 - The current Android Gradle workflow builds a debug APK, installs it on an emulator, verifies rendered page text, captures a screenshot, and uploads a temporary test artifact. KVM acceleration fixed the hosted emulator boot issue. The artifact is not a production downloader or Play Store build.
 - The iOS workflow builds and launches an unsigned Simulator app and uploads a simulator archive plus project source. This is not a device IPA or App Store build. Device distribution requires provisioning, signing, privacy disclosures, and store review.
 
-The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
+Spotify is not offered as a source in any client. Spotify links are rejected if pasted into the YouTube input. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
 ### Third-party source authorization is a release gate
 

@@ -39,7 +39,7 @@ jobs:
           python-version: "3.11"
       - name: Install test dependencies
         run: python -m pip install -r requirements-test.txt
-      - name: Test YouTube/Spotify URL policy and mobile source boundaries
+      - name: Test YouTube URL policy and mobile source boundaries
         run: python -m pytest -q tests/test_mobile_ui.py
       - name: Test shared WebView button interactions and error states
         run: node tests/mobile_shared_ui.test.cjs

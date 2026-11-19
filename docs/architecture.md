@@ -2,8 +2,8 @@
 
 MusicVault is a local-first PySide6 desktop application. URL policy and media configuration live in a separate core module so security-sensitive decisions can be tested without constructing the UI.
 
-- `musicvault_app.py` owns the window, source tabs, queue, progress display, user preferences, and worker-thread lifecycle.
-- `musicvault_core.py` owns YouTube URL validation, Spotify link hand-off validation, output-folder validation, yt-dlp options, app-data paths, packaged-tool discovery, log sanitization, and format helpers.
+- `musicvault_app.py` owns the window, YouTube input, queue, progress display, user preferences, and worker-thread lifecycle.
+- `musicvault_core.py` owns YouTube URL validation, unsupported-source rejection, output-folder validation, yt-dlp options, app-data paths, packaged-tool discovery, log sanitization, and format helpers.
 - `installer/MusicVault.iss` defines the Windows per-user installer and shortcuts.
 - `prepare_windows.ps1` and `prepare_macos.sh` stage checksum-pinned runtime components.
 
@@ -15,11 +15,11 @@ MusicVault is a local-first PySide6 desktop application. URL policy and media co
 4. FFmpeg converts or remuxes the downloaded media into the selected format.
 5. Progress and completion are returned to the UI via Qt signals; cancellation uses a thread-safe event.
 
-Spotify uses a separate path: official Spotify links are validated and opened via the operating system. Spotify URLs are never sent to the media downloader.
+Spotify is not an app source. Spotify URLs are rejected before they reach the media downloader.
 
 ## UI design
 
-The desktop interface uses a black/charcoal base. The active YouTube tab uses red accents and the active Spotify tab uses green accents. Motion is short and event-driven: button hover/press, tab fade, queue-row fade-in, progress interpolation, and a status pulse only while work is active. No idle animation loop runs when the queue is idle.
+The desktop interface uses a black/charcoal base with restrained red accents. Motion is short and event-driven: button hover/press, queue-row fade-in, progress interpolation, and a status pulse only while work is active. No idle animation loop runs when the queue is idle.
 
 ## Storage
 

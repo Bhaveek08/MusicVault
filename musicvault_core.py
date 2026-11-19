@@ -17,7 +17,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 APP_NAME = "MusicVault"
-APP_VERSION = "2.0.5"
+APP_VERSION = "2.0.6"
 MAX_URL_LENGTH = 2048
 MAX_PLAYLIST_ITEMS = 500
 MAX_QUEUE_ITEMS = 100
@@ -25,7 +25,6 @@ ALLOWED_YOUTUBE_HOSTS = frozenset({
     "youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com",
     "youtu.be", "www.youtu.be", "youtube-nocookie.com", "www.youtube-nocookie.com",
 })
-SPOTIFY_HOSTS = frozenset({"spotify.com", "www.spotify.com", "spotify.link"})
 VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
 PLAYLIST_ID_RE = re.compile(r"^[A-Za-z0-9_-]{10,80}$")
 
@@ -76,45 +75,9 @@ def get_app_data_dir(
     return Path(xdg).expanduser() if xdg else home_path / ".local" / "share"
 
 
-def validate_spotify_url(raw_url: str) -> str:
-    """Validate an official Spotify link for opening in Spotify, not exporting.
-
-    Only canonical Spotify web hosts are opened. Short links are accepted
-    because spotify.link is an official Spotify domain; URL query strings and
-    fragments are removed to avoid carrying tracking parameters further.
-    """
-    if not isinstance(raw_url, str):
-        raise SourceValidationError("Paste an official Spotify link.")
-    value = raw_url.strip()
-    if not value or len(value) > MAX_URL_LENGTH:
-        raise SourceValidationError("Paste a valid Spotify track, album, artist, or playlist link.")
-    if any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
-        raise SourceValidationError("The Spotify link contains invalid control characters.")
-    try:
-        parsed = urlsplit(value)
-        host = (parsed.hostname or "").lower().rstrip(".")
-        port = parsed.port
-    except ValueError as exc:
-        raise SourceValidationError("That Spotify link is malformed.") from exc
-    allowed = {"open.spotify.com", "spotify.com", "www.spotify.com", "spotify.link"}
-    if parsed.scheme.lower() != "https":
-        raise SourceValidationError("For safety, Spotify links must use HTTPS.")
-    if parsed.username is not None or parsed.password is not None:
-        raise SourceValidationError("Spotify links containing usernames or passwords are not accepted.")
-    if port not in (None, 443):
-        raise SourceValidationError("Custom URL ports are not accepted.")
-    if host not in allowed:
-        raise SourceValidationError("Only official Spotify links can be opened here.")
-    segments = [part for part in parsed.path.split("/") if part]
-    if not segments and host in {"spotify.com", "www.spotify.com"}:
-        return "https://open.spotify.com/"
-    if not segments or any(not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", part) for part in segments):
-        raise SourceValidationError("That Spotify link does not look like a supported share link.")
-    return f"https://{host}/{'/'.join(segments)}"
-
 def _is_spotify_host(host: str) -> bool:
     host = host.lower().rstrip(".")
-    return host in SPOTIFY_HOSTS or host.endswith(".spotify.com")
+    return host in {"spotify.com", "www.spotify.com", "spotify.link"} or host.endswith(".spotify.com")
 
 
 def validate_source_url(raw_url: str) -> ValidatedSource:

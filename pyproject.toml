@@ -1,7 +1,7 @@
 [project]
 name = "musicvault"
-version = "2.0.5"
-description = "A lightweight desktop app for YouTube media downloads and Spotify link hand-off."
+version = "2.0.6"
+description = "A lightweight desktop app for permitted YouTube media downloads."
 readme = "README.md"
 requires-python = ">=3.11"
 

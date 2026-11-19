@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 import shiboken6
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication, QFileDialog, QFrame, QMessageBox, QPushButton, QTabWidget
+from PySide6.QtWidgets import QApplication, QFileDialog, QFrame, QMessageBox, QPushButton
 
 import musicvault_app
 from musicvault_app import MusicVaultWindow
@@ -79,11 +79,12 @@ def test_desktop_columns_do_not_overlap_at_preview_size(window):
     window.resize(1200, 820)
     QApplication.processEvents()
     root = window.centralWidget()
-    tabs = window.findChild(QTabWidget, "SourceTabs")
+    source = window.findChild(QFrame, "YouTubeCard")
     queue_card = window.findChild(QFrame, "QueueCard")
-    tabs_origin = tabs.mapTo(root, tabs.rect().topLeft())
+    source_origin = source.mapTo(root, source.rect().topLeft())
     queue_origin = queue_card.mapTo(root, queue_card.rect().topLeft())
-    assert tabs_origin.x() + tabs.width() <= queue_origin.x()
+    assert source_origin.x() + source.width() <= queue_origin.x()
+    assert source.isVisible()
 
 
 def test_long_save_path_is_elided_and_available_in_tooltip(window):
@@ -133,65 +134,12 @@ def test_playlist_only_link_requires_playlist_option(window, warnings):
     assert window.queue_list.count() == 0
 
 
-def test_spotify_tab_and_open_link_action(window, monkeypatch, warnings):
-    tabs = window.findChild(QTabWidget, "SourceTabs")
-    assert tabs is not None
-    tabs.setCurrentIndex(1)
-    QApplication.processEvents()
-    assert window.statusBar().currentMessage() == "Spotify link hand-off"
-
-    opened = []
-    monkeypatch.setattr(
-        musicvault_app.QDesktopServices,
-        "openUrl",
-        lambda url: opened.append(url.toString()) or True,
-    )
-    window.spotify_input.setText("https://open.spotify.com/track/1234567890123456789012")
-    click_button(window, "Open in Spotify")
-    assert opened == ["https://open.spotify.com/track/1234567890123456789012"]
-    window.spotify_input.setText("https://evil.example/track/1234567890123456789012")
-    click_button(window, "Open in Spotify")
-    assert warnings and "official Spotify" in warnings[-1]
-
-
-def test_spotify_tab_shows_offline_help_instead_of_export_controls(window, monkeypatch):
-    assert window.queue_card.isVisible()
-    assert window.formats_card.isVisible()
-    assert not window.spotify_info_card.isVisible()
-
-    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
-    QApplication.processEvents()
-    assert not window.queue_card.isVisible()
-    assert not window.formats_card.isVisible()
-    assert window.spotify_info_card.isVisible()
-
-    opened = []
-    monkeypatch.setattr(
-        musicvault_app.QDesktopServices,
-        "openUrl",
-        lambda url: opened.append(url.toString()) or True,
-    )
-    click_button(window, "Spotify offline guide")
-    assert opened == ["https://support.spotify.com/us/article/listen-offline/"]
-
-
-def test_spotify_open_failure_shows_recoverable_error(window, monkeypatch, warnings):
-    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
-    QApplication.processEvents()
-    monkeypatch.setattr(musicvault_app.QDesktopServices, "openUrl", lambda _url: False)
-    window.spotify_input.setText("https://open.spotify.com/track/1234567890123456789012")
-    click_button(window, "Open in Spotify")
-    assert "Could not open Spotify" in warnings[-1]
-
-
-def test_authorized_music_source_buttons_open_official_sites(window, monkeypatch):
-    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
-    QApplication.processEvents()
-    opened = []
-    monkeypatch.setattr(musicvault_app.QDesktopServices, "openUrl", lambda url: opened.append(url.toString()) or True)
-    click_button(window, "Explore Bandcamp")
-    click_button(window, "Explore SoundCloud")
-    assert opened == ["https://bandcamp.com/", "https://soundcloud.com/"]
+def test_spotify_option_is_removed_from_desktop_ui(window):
+    assert window.findChild(QFrame, "YouTubeCard").isVisible()
+    assert window.findChild(QFrame, "QueueCard").isVisible()
+    assert window.findChild(QFrame, "FormatsCard").isVisible()
+    assert not any("Spotify" in button.text() for button in window.findChildren(QPushButton))
+    assert not hasattr(window, "spotify_input")
 
 
 def test_queue_state_updates_progress_and_error(window):
@@ -218,14 +166,6 @@ def test_youtube_paste_button_uses_clipboard(window):
     QApplication.clipboard().setText("https://youtu.be/BaW_jenozKc")
     click_button(window, "Paste")
     assert window.url_input.text() == "https://youtu.be/BaW_jenozKc"
-
-
-def test_spotify_paste_button_uses_clipboard(window):
-    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
-    QApplication.processEvents()
-    QApplication.clipboard().setText("https://open.spotify.com/track/1234567890123456789012")
-    click_button(window, "Paste")
-    assert window.spotify_input.text() == "https://open.spotify.com/track/1234567890123456789012"
 
 
 def test_change_folder_button_updates_path_and_persists_setting(window, tmp_path, monkeypatch):

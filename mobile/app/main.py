@@ -8,8 +8,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFrame, QGraphicsOpacityEffect, QHBoxLayout, QLabel,
     QLineEdit, QListWidget, QListWidgetItem, QPushButton, QScrollArea,
@@ -17,9 +16,9 @@ from PySide6.QtWidgets import (
 )
 
 try:
-    from .source_validation import validate_spotify_link, validate_youtube_link
+    from .source_validation import validate_youtube_link
 except ImportError:  # Direct script invocation during local preview/deployment.
-    from source_validation import validate_spotify_link, validate_youtube_link
+    from source_validation import validate_youtube_link
 
 
 FORMATS = ("MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS", "MKV")
@@ -111,29 +110,13 @@ class MusicVaultMobileWindow(QWidget):
         title = QLabel("Downloads")
         title.setObjectName("Hero")
         body.addWidget(title)
-        lead = QLabel("Add a video or playlist. Choose how to save it.")
+        lead = QLabel("Add a permitted video or playlist to your queue.")
         lead.setObjectName("Hint")
         lead.setWordWrap(True)
         body.addWidget(lead)
 
-        tabs = QHBoxLayout()
-        tabs.setSpacing(8)
-        self.youtube_tab = AnimatedButton("YouTube")
-        self.youtube_tab.setObjectName("YoutubeTab")
-        self.spotify_tab = AnimatedButton("Spotify")
-        self.spotify_tab.setObjectName("SpotifyTab")
-        self.youtube_tab.clicked.connect(lambda: self.set_source("youtube"))
-        self.spotify_tab.clicked.connect(lambda: self.set_source("spotify"))
-        tabs.addWidget(self.youtube_tab, 1)
-        tabs.addWidget(self.spotify_tab, 1)
-        body.addLayout(tabs)
-
-        self.pages = QStackedWidget()
         self.youtube_page = self._build_youtube_page()
-        self.spotify_page = self._build_spotify_page()
-        self.pages.addWidget(self.youtube_page)
-        self.pages.addWidget(self.spotify_page)
-        body.addWidget(self.pages)
+        body.addWidget(self.youtube_page)
 
         queue_card, queue_layout = self._card("Queue")
         self.queue_stack = QStackedWidget()
@@ -162,7 +145,6 @@ class MusicVaultMobileWindow(QWidget):
 
         self.scroll.setWidget(page)
         root_layout.addWidget(self.scroll, 1)
-        self.set_source("youtube")
 
     def _build_youtube_page(self) -> QWidget:
         page = QWidget()
@@ -209,49 +191,6 @@ class MusicVaultMobileWindow(QWidget):
         layout.addWidget(card)
         return page
 
-    def _build_spotify_page(self) -> QWidget:
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(12)
-
-        card, card_layout = self._card("Spotify", "Track, album, artist or playlist")
-        self.spotify_input = QLineEdit()
-        self.spotify_input.setObjectName("LinkInput")
-        self.spotify_input.setPlaceholderText("Paste Spotify link")
-        self.spotify_input.setClearButtonEnabled(True)
-        self.spotify_input.setMinimumHeight(46)
-        paste_row = QHBoxLayout()
-        paste_row.setSpacing(8)
-        paste_row.addWidget(self.spotify_input, 1)
-        self.spotify_paste = AnimatedButton("Paste")
-        self.spotify_paste.setObjectName("SecondaryButton")
-        self.spotify_paste.setMinimumHeight(46)
-        self.spotify_paste.clicked.connect(lambda: self.spotify_input.setText(QApplication.clipboard().text().strip()))
-        paste_row.addWidget(self.spotify_paste)
-        card_layout.addLayout(paste_row)
-
-        self.open_spotify_button = AnimatedButton("Open in Spotify")
-        self.open_spotify_button.setObjectName("SpotifyButton")
-        self.open_spotify_button.clicked.connect(self.open_spotify)
-        card_layout.addWidget(self.open_spotify_button)
-        note = QLabel("Playback and offline listening stay in Spotify. Protected streams are not exported.")
-        note.setObjectName("Hint")
-        note.setWordWrap(True)
-        card_layout.addWidget(note)
-        layout.addWidget(card)
-        return page
-
-    def set_source(self, source: str) -> None:
-        spotify = source == "spotify"
-        self.pages.setCurrentIndex(1 if spotify else 0)
-        self.youtube_tab.setProperty("active", not spotify)
-        self.spotify_tab.setProperty("active", spotify)
-        self.youtube_tab.style().unpolish(self.youtube_tab)
-        self.youtube_tab.style().polish(self.youtube_tab)
-        self.spotify_tab.style().unpolish(self.spotify_tab)
-        self.spotify_tab.style().polish(self.spotify_tab)
-
     def add_youtube_preview(self) -> None:
         try:
             kind = validate_youtube_link(self.youtube_input.text())
@@ -263,14 +202,6 @@ class MusicVaultMobileWindow(QWidget):
             self.queue.addItem(QListWidgetItem(label))
             self.queue_stack.setCurrentIndex(1)
             self.queue_status.setText("Added to preview queue. Downloads are not enabled in this mobile build yet.")
-        except ValueError as exc:
-            self.queue_status.setText(str(exc))
-
-    def open_spotify(self) -> None:
-        try:
-            url = validate_spotify_link(self.spotify_input.text())
-            opened = QDesktopServices.openUrl(QUrl(url))
-            self.queue_status.setText("Opened in Spotify." if opened else "Spotify could not open this link.")
         except ValueError as exc:
             self.queue_status.setText(str(exc))
 
@@ -304,18 +235,11 @@ class MusicVaultMobileWindow(QWidget):
             QCheckBox::indicator:unchecked { background:#0F1217; border:1px solid #718092; border-radius:6px; }
             QCheckBox::indicator:checked { background:#D0DBEA; border:1px solid #D0DBEA; border-radius:6px; }
             QPushButton { min-height:46px; border-radius:11px; font-size:14px; font-weight:700; padding:9px 14px; }
-            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }\n            QPushButton#YoutubeButton:focus, QPushButton#SpotifyButton:focus, QPushButton#SecondaryButton:focus,\n            QPushButton#StopButton:focus, QPushButton#TextButton:focus, QPushButton#YoutubeTab:focus,\n            QPushButton#SpotifyTab:focus { border:2px solid #F4F6F8; }
-            QPushButton#YoutubeTab, QPushButton#SpotifyTab {
-                background:#191E26; color:#C0C8D2; border:1px solid #3A4553;
-            }
-            QPushButton#YoutubeTab[active="true"] { background:#32191D; color:#FFB0B4; border:1px solid #744047; }
-            QPushButton#SpotifyTab[active="true"] { background:#14291F; color:#9CE8B9; border:1px solid #356B4B; }
+            QPushButton:focus { outline:2px solid #D8E4F2; outline-offset:2px; }\n            QPushButton#YoutubeButton:focus, QPushButton#SecondaryButton:focus,
+            QPushButton#StopButton:focus, QPushButton#TextButton:focus { border:2px solid #F4F6F8; }
             QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; border:1px solid #E74D56; }
             QPushButton#YoutubeButton:hover { background:#EA454D; }
             QPushButton#YoutubeButton:pressed { background:#B82C35; }
-            QPushButton#SpotifyButton { background:#16864A; color:#FFFFFF; border:1px solid #29985B; }
-            QPushButton#SpotifyButton:hover { background:#1A9654; }
-            QPushButton#SpotifyButton:pressed { background:#116C3B; }
             QPushButton#SecondaryButton { background:#222832; color:#F0F2F5; border:1px solid #3A4553; }
             QPushButton#SecondaryButton:hover { background:#2B333F; }
             QListWidget#Queue { border:0; padding:4px; }

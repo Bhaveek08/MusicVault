@@ -14,21 +14,14 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from PySide6.QtGui import QPixmap
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QTabWidget
+from PySide6.QtWidgets import QApplication
 
 from musicvault_app import MusicVaultWindow
 from mobile.app.main import MusicVaultMobileWindow
 
 
-def render(widget, output: Path, size: QSize, *, desktop_tab: int | None = None, mobile_source: str | None = None) -> None:
+def render(widget, output: Path, size: QSize) -> None:
     widget.resize(size)
-    if desktop_tab is not None:
-        tabs = widget.findChild(QTabWidget, "SourceTabs")
-        if tabs is None:
-            raise RuntimeError("Desktop source tabs were not found.")
-        tabs.setCurrentIndex(desktop_tab)
-    if mobile_source is not None:
-        widget.set_source(mobile_source)
 
     widget.show()
     QApplication.processEvents()
@@ -64,19 +57,12 @@ def main() -> int:
 
     desktop_youtube = MusicVaultWindow()
     desktop_youtube.folder_label.set_full_text("~/Music/MusicVault")
-    render(desktop_youtube, args.output / "desktop-youtube.png", QSize(1200, 900), desktop_tab=0)
-
-    desktop_spotify = MusicVaultWindow()
-    desktop_spotify.folder_label.set_full_text("~/Music/MusicVault")
-    render(desktop_spotify, args.output / "desktop-spotify.png", QSize(1200, 900), desktop_tab=1)
+    render(desktop_youtube, args.output / "desktop-youtube.png", QSize(1200, 900))
 
     mobile_youtube = MusicVaultMobileWindow()
-    render(mobile_youtube, args.output / "mobile-prototype-youtube.png", QSize(390, 844), mobile_source="youtube")
+    render(mobile_youtube, args.output / "mobile-prototype-youtube.png", QSize(390, 844))
 
-    mobile_spotify = MusicVaultMobileWindow()
-    render(mobile_spotify, args.output / "mobile-prototype-spotify.png", QSize(390, 844), mobile_source="spotify")
-
-    print(f"Captured 4 UI previews in {args.output}", flush=True)
+    print(f"Captured 2 UI previews in {args.output}", flush=True)
     # PySide6 6.12 can SIGBUS during process teardown under hosted Xvfb after
     # the PNGs have been saved. This helper is a one-shot CI process, so skip
     # Qt's unstable global teardown only after every screenshot write succeeded.

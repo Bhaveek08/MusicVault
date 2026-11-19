@@ -8,19 +8,19 @@ import threading
 import shiboken6
 from dataclasses import dataclass
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, QUrl, Signal
-from PySide6.QtGui import QDesktopServices, QFontMetrics, QIcon
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, Signal
+from PySide6.QtGui import QFontMetrics, QIcon
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout,
     QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStackedWidget,
-    QProgressBar, QPushButton, QTabWidget, QVBoxLayout, QWidget, QGraphicsOpacityEffect,
+    QProgressBar, QPushButton, QVBoxLayout, QWidget, QGraphicsOpacityEffect,
     QSizePolicy,
 )
 
 from musicvault_core import (
     APP_NAME, APP_VERSION, DownloadCancelled, build_ydl_options,
     describe_download_error, find_deno, find_ffmpeg, validate_output_folder,
-    validate_source_url, validate_spotify_url,
+    validate_source_url,
 )
 
 AUDIO_FORMATS = ("MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS")
@@ -245,11 +245,6 @@ class MusicVaultWindow(QMainWindow):
         hero_copy.addWidget(hero_mark)
         left_column.addWidget(hero)
 
-        tabs = QTabWidget()
-        tabs.setObjectName("SourceTabs")
-        tabs.setDocumentMode(True)
-        tabs.setMovable(False)
-
         youtube = QWidget()
         ybox = QVBoxLayout(youtube)
         ybox.setContentsMargins(12, 10, 12, 10)
@@ -338,67 +333,7 @@ class MusicVaultWindow(QMainWindow):
         ybox.addWidget(settings_card)
         ybox.addStretch(1)
 
-        spotify = QWidget()
-        sbox = QVBoxLayout(spotify)
-        sbox.setContentsMargins(14, 16, 14, 16)
-        sbox.setSpacing(14)
-
-        spotify_card, spotify_layout = self._card("Spotify")
-        spotify_card.setObjectName("SpotifyCard")
-        spotify_hint = QLabel("Open a track, album, artist or playlist")
-        spotify_hint.setObjectName("Hint")
-        spotify_layout.addWidget(spotify_hint)
-        self.spotify_input = QLineEdit()
-        self.spotify_input.setPlaceholderText("open.spotify.com/…")
-        self.spotify_input.setClearButtonEnabled(True)
-        self.spotify_input.setMinimumHeight(44)
-        self.spotify_input.setAccessibleName("Spotify share link")
-        self.spotify_input.returnPressed.connect(self.open_spotify)
-        spotify_layout.addWidget(self.spotify_input)
-
-        spotify_actions = QHBoxLayout()
-        spotify_paste = MotionButton("Paste")
-        spotify_paste.setObjectName("SecondaryButton")
-        spotify_paste.setMinimumHeight(44)
-        spotify_paste.clicked.connect(lambda: self.spotify_input.setText(QApplication.clipboard().text().strip()))
-        spotify_actions.addWidget(spotify_paste)
-        spotify_actions.addStretch(1)
-        open_button = MotionButton("Open in Spotify")
-        open_button.setObjectName("SpotifyButton")
-        open_button.setMinimumHeight(44)
-        open_button.clicked.connect(self.open_spotify)
-        spotify_actions.addWidget(open_button)
-        spotify_layout.addLayout(spotify_actions)
-
-        note = QLabel("Spotify keeps playback and offline listening in its app. MusicVault can’t export Spotify streams. For files, use an artist-authorized download, such as a Bandcamp purchase or a SoundCloud track with downloads enabled.")
-        note.setObjectName("SpotifyNote")
-        note.setWordWrap(True)
-        spotify_layout.addWidget(note)
-        sbox.addWidget(spotify_card)
-        sources_card, sources_layout = self._card("Downloadable music")
-        sources_hint = QLabel("Get files directly from artists and authorized storefronts.")
-        sources_hint.setObjectName("Hint")
-        sources_layout.addWidget(sources_hint)
-        source_links = QHBoxLayout()
-        source_links.setSpacing(8)
-        bandcamp_button = MotionButton("Explore Bandcamp")
-        bandcamp_button.setObjectName("SecondaryButton")
-        bandcamp_button.setMinimumHeight(44)
-        bandcamp_button.clicked.connect(lambda: self._open_music_source("https://bandcamp.com/"))
-        source_links.addWidget(bandcamp_button)
-        soundcloud_button = MotionButton("Explore SoundCloud")
-        soundcloud_button.setObjectName("SecondaryButton")
-        soundcloud_button.setMinimumHeight(44)
-        soundcloud_button.clicked.connect(lambda: self._open_music_source("https://soundcloud.com/"))
-        source_links.addWidget(soundcloud_button)
-        sources_layout.addLayout(source_links)
-        sbox.addWidget(sources_card)
-        sbox.addStretch(1)
-
-        tabs.addTab(youtube, "YouTube")
-        tabs.addTab(spotify, "Spotify")
-        tabs.currentChanged.connect(self._tab_changed)
-        left_column.addWidget(tabs, 1)
+        left_column.addWidget(youtube, 1)
         columns.addLayout(left_column, 7)
 
         # Right: live queue and concise format reference.
@@ -473,26 +408,6 @@ class MusicVaultWindow(QMainWindow):
         formats_layout.addLayout(format_rows)
         right_column.addWidget(formats_card)
 
-        self.spotify_info_card, spotify_info_layout = self._card("Spotify offline listening")
-        spotify_info_layout.addStretch(1)
-        spotify_info = QLabel(
-            "Save albums and playlists for offline listening in Spotify. Those downloads stay in Spotify; "
-            "they aren’t MP3 files in your MusicVault library."
-        )
-        spotify_info.setObjectName("SpotifyInfo")
-        spotify_info.setWordWrap(True)
-        spotify_info.setAlignment(Qt.AlignCenter)
-        spotify_info_layout.addWidget(spotify_info)
-        spotify_help = MotionButton("Spotify offline guide")
-        spotify_help.setObjectName("SecondaryButton")
-        spotify_help.setMinimumHeight(44)
-        spotify_help.clicked.connect(lambda: self._open_music_source(
-            "https://support.spotify.com/us/article/listen-offline/"
-        ))
-        spotify_info_layout.addWidget(spotify_help)
-        spotify_info_layout.addStretch(1)
-        self.spotify_info_card.hide()
-        right_column.addWidget(self.spotify_info_card, 1)
         columns.addLayout(right_column, 5)
 
         outer.addLayout(columns, 1)
@@ -521,10 +436,6 @@ class MusicVaultWindow(QMainWindow):
             QLabel#QueueCount { color:#B7C1CE; font-size:8pt; font-weight:730; letter-spacing:1px; }
             QLabel#EmptyState { color:#B8C2CF; background:#0D1116; border:1px dashed #343E4B;
                                 border-radius:16px; padding:24px; font-size:10pt; }
-            QLabel#SpotifyNote { color:#C2CBD6; background:#0F1713; border:1px solid #263B2F;
-                                 border-radius:12px; padding:14px; font-size:9pt; }
-            QLabel#SpotifyInfo { color:#C2CBD6; background:transparent; border:0;
-                                 padding:16px; font-size:10pt; }
             QLabel#FormatPill { background:#171E27; border:1px solid #303B49; color:#DDE4EC;
                                 border-radius:10px; padding:9px 5px; font-size:9pt; font-weight:720; }
             QFrame[musicVaultCard="true"] { background:#141820; border:1px solid #2A323E; border-radius:19px; }
@@ -540,15 +451,6 @@ class MusicVaultWindow(QMainWindow):
             QCheckBox::indicator { width:19px; height:19px; }
             QCheckBox::indicator:unchecked { background:#0E1218; border:1px solid #748194; border-radius:6px; }
             QCheckBox::indicator:checked { background:#D5DFEC; border:1px solid #D5DFEC; border-radius:6px; }
-            QTabWidget#SourceTabs { background:transparent; }
-            QTabWidget#SourceTabs::pane { border:0; background:transparent; top:0; }
-            QTabWidget#SourceTabs::tab-bar { background:transparent; }
-            QTabBar { background:transparent; }
-            QTabBar::tab { min-width:112px; color:#AEB9C7; background:#151A21;
-                           padding:13px 22px; margin-right:8px; border:1px solid #2D3744;
-                           border-radius:12px; font-weight:690; }
-            QTabBar::tab:selected { color:#FFFFFF; background:#302027; border-color:#87545B; }
-            QTabBar::tab:hover:!selected { color:#F0F3F6; background:#202732; }
             QPushButton { color:#F4F6F8; border:1px solid transparent; border-radius:11px;
                           padding:6px 14px; font-weight:700; min-height:22px; }
             QPushButton:focus { border:2px solid #F4F6F8; }
@@ -557,9 +459,6 @@ class MusicVaultWindow(QMainWindow):
                 stop:0 #E74750,stop:1 #CF3540); color:#FFFFFF; border-color:#ED646A; }
             QPushButton#YoutubeButton:hover { background:#ED5059; }
             QPushButton#YoutubeButton:pressed { background:#BA2D36; }
-            QPushButton#SpotifyButton { background:qlineargradient(x1:0,y1:0,x2:0,y2:1,
-                stop:0 #1E9C5B,stop:1 #147A45); color:#FFFFFF; border-color:#35AC6D; }
-            QPushButton#SpotifyButton:hover { background:#22A562; }
             QPushButton#SecondaryButton { background:#242D39; color:#F2F5F8; border-color:#465363; }
             QPushButton#SecondaryButton:hover { background:#303B49; border-color:#586779; }
             QPushButton#StopButton { background:#332328; color:#FFC9C7; border-color:#70444A; }
@@ -572,13 +471,6 @@ class MusicVaultWindow(QMainWindow):
             QProgressBar::chunk { background:#D93640; border-radius:4px; }
             QStatusBar { color:#A8B2C0; background:#0A0C10; border-top:1px solid #252C36; }
         """)
-
-    def _tab_changed(self, index: int) -> None:
-        spotify = index == 1
-        self.queue_card.setVisible(not spotify)
-        self.formats_card.setVisible(not spotify)
-        self.spotify_info_card.setVisible(spotify)
-        self.statusBar().showMessage("YouTube downloads" if index == 0 else "Spotify link hand-off", 2500)
 
     def _animate_intro(self) -> None:
         self.setWindowOpacity(0.0)
@@ -622,19 +514,6 @@ class MusicVaultWindow(QMainWindow):
             self.statusBar().showMessage("Added to queue", 2500)
         except Exception as exc:
             QMessageBox.warning(self, APP_NAME, str(exc))
-
-    def open_spotify(self) -> None:
-        try:
-            url = validate_spotify_url(self.spotify_input.text())
-            if not QDesktopServices.openUrl(QUrl(url)):
-                raise RuntimeError("Could not open Spotify. Check that Spotify or a browser is installed.")
-            self.statusBar().showMessage("Opened in Spotify", 3000)
-        except Exception as exc:
-            QMessageBox.warning(self, APP_NAME, str(exc))
-
-    def _open_music_source(self, url: str) -> None:
-        if not QDesktopServices.openUrl(QUrl(url)):
-            QMessageBox.warning(self, APP_NAME, "Could not open your browser. Please try again.")
 
     def _update_queue(self) -> None:
         self.queue_count.setText(f"{len(self.jobs)} ITEMS")

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from mobile.app.source_validation import validate_spotify_link, validate_youtube_link
+from mobile.app.source_validation import validate_youtube_link
 
 
 @pytest.mark.parametrize(("url", "kind"), [
@@ -39,42 +39,14 @@ def test_youtube_rejects_unsafe_or_malformed_links(url):
         validate_youtube_link(url)
 
 
-@pytest.mark.parametrize("url", [
-    "https://open.spotify.com/track/1234567890123456789012",
-    "https://open.spotify.com/album/1234567890123456789012",
-    "https://open.spotify.com/playlist/1234567890123456789012",
-    "https://open.spotify.com/artist/1234567890123456789012",
-    "https://open.spotify.com/show/1234567890123456789012",
-    "https://open.spotify.com/episode/1234567890123456789012",
-    "https://spotify.link/AbCdEf",
-])
-def test_spotify_official_share_links(url):
-    assert validate_spotify_link(url) == url
-
-
-@pytest.mark.parametrize("url", [
-    "http://open.spotify.com/track/1234567890123456789012",
-    "https://spotify.com.evil.example/track/1234567890123456789012",
-    "https://evil.example/track/1234567890123456789012",
-    "https://user:pass@open.spotify.com/track/1234567890123456789012",
-    "https://open.spotify.com:444/track/1234567890123456789012",
-    "https://open.spotify.com/not-a-type/1234567890123456789012",
-    "https://open.spotify.com/track/short",
-    "https://open.spotify.com/track/1234567890123456789012\n?si=x",
-    "",
-    "x" * 3000,
-])
-def test_spotify_rejects_unsafe_or_malformed_links(url):
-    with pytest.raises(ValueError):
-        validate_spotify_link(url)
-
-
-def test_mobile_ui_source_has_both_provider_sections_and_no_downloader_worker():
+def test_mobile_ui_has_no_spotify_option_or_downloader_worker():
     source = Path("mobile/app/main.py").read_text(encoding="utf-8")
     assert 'self._card("YouTube"' in source
-    assert 'self._card("Spotify"' in source
+    assert "Spotify" not in source
+    html = Path("mobile/shared/index.html").read_text(encoding="utf-8")
+    assert "Spotify" not in html
     assert "downloads are not enabled in this mobile build yet" in source.lower()
     assert "import yt_dlp" not in source
     assert "subprocess" not in source
-    assert "QDesktopServices.openUrl" in source
+    assert "QDesktopServices" not in source
     assert "Include full playlist" in source

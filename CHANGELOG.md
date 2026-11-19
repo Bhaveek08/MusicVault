@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.6 — 2026-11-19
+
+- Remove the Spotify source tab, Spotify link hand-off, offline guide panel, and Spotify-specific controls from desktop and mobile UIs.
+- Simplify the download workspace to a single YouTube source and update previews, documentation, and interaction coverage.
+
 ## 2.0.5 — 2026-11-19
 
 - Refresh the full desktop experience with a library hero, balanced source tabs, richer surface colors, and consistent focus/hover states.

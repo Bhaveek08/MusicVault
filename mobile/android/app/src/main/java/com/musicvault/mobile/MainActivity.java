@@ -1,10 +1,7 @@
 package com.musicvault.mobile;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import androidx.webkit.WebViewAssetLoader;
@@ -13,33 +10,15 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 import android.webkit.WebResourceResponse;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
 
 public final class MainActivity extends Activity {
-    private static final Set<String> SPOTIFY_HOSTS = new HashSet<>(Arrays.asList(
-        "open.spotify.com", "www.spotify.com", "spotify.com", "spotify.link"
-    ));
-
     private WebView webView;
     private WebViewAssetLoader assetLoader;
-
-    static boolean isAllowedSpotifyUri(Uri uri) {
-        if (uri == null || !"https".equalsIgnoreCase(uri.getScheme())) return false;
-        String host = uri.getHost();
-        if (host == null) return false;
-        host = host.toLowerCase(Locale.ROOT);
-        return SPOTIFY_HOSTS.contains(host) && (uri.getPort() == -1 || uri.getPort() == 443)
-            && uri.getUserInfo() == null;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,14 +96,6 @@ public final class MainActivity extends Activity {
                 if ("https".equalsIgnoreCase(uri.getScheme())
                     && "appassets.androidplatform.net".equalsIgnoreCase(uri.getHost())
                     && uri.getPath() != null && uri.getPath().startsWith("/assets/")) return false;
-                if (isAllowedSpotifyUri(uri)) {
-                    try {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException ignored) {
-                        Toast.makeText(MainActivity.this, "Install Spotify or open this link in a browser.", Toast.LENGTH_LONG).show();
-                    }
-                }
                 return true;
             }
 

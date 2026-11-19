@@ -62,23 +62,19 @@ class FakeElement {
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "mobile/shared/index.html"), "utf8");
 const source = fs.readFileSync(path.join(root, "mobile/shared/app.js"), "utf8");
+assert.doesNotMatch(html, /spotify/i);
 const elements = new Map([...html.matchAll(/\bid="([^"]+)"/g)].map(([, id]) => [id, new FakeElement(id)]));
 const requiredIds = [
-  "app", "youtubeTab", "spotifyTab", "youtubePanel", "spotifyPanel", "youtubeUrl", "spotifyUrl",
-  "pasteYoutube", "pasteSpotify", "addQueue", "openSpotify", "clearQueue", "format", "playlist",
-  "permission", "queueCount", "emptyState", "queueList", "youtubeStatus", "spotifyStatus",
+  "youtubePanel", "youtubeUrl", "pasteYoutube", "addQueue", "clearQueue", "format", "playlist",
+  "permission", "queueCount", "emptyState", "queueList", "youtubeStatus",
 ];
 for (const id of requiredIds) assert.ok(elements.has(id), `shared HTML is missing #${id}`);
-elements.get("spotifyPanel").classList.add("is-hidden");
-elements.get("spotifyTab").setAttribute("aria-pressed", "false");
-elements.get("youtubeTab").setAttribute("aria-pressed", "true");
 elements.get("queueList").classList.add("is-hidden");
 elements.get("format").value = "MP3";
 elements.get("clearQueue").disabled = true;
 
 let clipboardText = "";
 let clipboardError = false;
-let openedUrl = "";
 const context = {
   document: {
     getElementById: (id) => elements.get(id) || null,
@@ -88,16 +84,9 @@ const context = {
     if (clipboardError) throw new Error("Clipboard unavailable");
     return clipboardText;
   } } },
-  window: {},
   URL,
   console,
 };
-Object.defineProperty(context.window, "location", {
-  value: Object.defineProperty({}, "href", {
-    get: () => openedUrl,
-    set: (value) => { openedUrl = value; },
-  }),
-});
 vm.runInNewContext(source, context, { filename: "mobile/shared/app.js" });
 
 const $ = (id) => elements.get(id);
@@ -106,14 +95,6 @@ const buttonIds = [...html.matchAll(/<button\b[^>]*\bid="([^"]+)"/g)].map(([, id
 for (const id of buttonIds) assert.ok($(id).listeners.has("click"), `button #${id} is not wired`);
 
 async function main() {
-  await $("spotifyTab").click();
-  assert.equal($("app").dataset.source, "spotify");
-  assert.equal($("spotifyTab").attributes["aria-pressed"], "true");
-  assert.equal($("youtubePanel").classList.contains("is-hidden"), true);
-  await $("youtubeTab").click();
-  assert.equal($("app").dataset.source, "youtube");
-  assert.equal($("youtubeTab").attributes["aria-pressed"], "true");
-
   clipboardError = true;
   await $("pasteYoutube").click();
   assert.match(status("youtubeStatus"), /Clipboard unavailable/);
@@ -140,17 +121,6 @@ async function main() {
   $("playlist").checked = true;
   await $("addQueue").click();
   assert.equal($("queueCount").textContent, "2 ITEMS");
-
-  $("spotifyUrl").value = "https://spotify.com.evil.example/track/12345678901234567890";
-  await $("openSpotify").click();
-  assert.match(status("spotifyStatus"), /official HTTPS/i);
-  assert.equal(openedUrl, "");
-  clipboardText = "https://open.spotify.com/track/12345678901234567890";
-  await $("pasteSpotify").click();
-  assert.equal($("spotifyUrl").value, clipboardText);
-  await $("openSpotify").click();
-  assert.equal(openedUrl, clipboardText);
-  assert.match(status("spotifyStatus"), /Opening Spotify/i);
 
   for (let index = 0; index < 48; index += 1) {
     $("youtubeUrl").value = "https://youtu.be/BaW_jenozKc";

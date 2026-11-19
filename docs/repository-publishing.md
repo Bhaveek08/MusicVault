@@ -6,7 +6,7 @@ contents and choose the repository visibility before publishing.
 ## Recommended repository settings
 
 - Repository name: `musicvault`
-- Description: `A desktop app for supported YouTube media downloads and Spotify link hand-off.`
+- Description: `A desktop app for permitted YouTube media downloads.`
 - Topics: `desktop-application`, `python`, `pyside6`, `windows`, `macos`, `yt-dlp`, `ffmpeg`
 - Default branch: `main`
 - Security: enable private vulnerability reporting when available; keep secret

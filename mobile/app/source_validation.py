@@ -5,12 +5,8 @@ import re
 from urllib.parse import parse_qs, urlsplit
 
 YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"}
-SPOTIFY_HOSTS = {"open.spotify.com", "www.spotify.com", "spotify.com", "spotify.link"}
 VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
 PLAYLIST_ID = re.compile(r"^[A-Za-z0-9_-]{10,80}$")
-SPOTIFY_SHORT_ID = re.compile(r"^[A-Za-z0-9_-]{1,100}$")
-SPOTIFY_RESOURCE_ID = re.compile(r"^[A-Za-z0-9]{22}$")
-SPOTIFY_TYPES = {"track", "album", "artist", "playlist", "show", "episode"}
 
 
 def _parse_official_https_url(value: str, allowed_hosts: set[str], provider: str):
@@ -57,15 +53,3 @@ def validate_youtube_link(value: str) -> str:
             raise ValueError("That YouTube playlist link is missing a valid playlist ID.")
         return "playlist"
     raise ValueError("Use a YouTube video or playlist link.")
-
-
-def validate_spotify_link(value: str) -> str:
-    parsed, host = _parse_official_https_url(value, SPOTIFY_HOSTS, "Spotify")
-    parts = [part for part in parsed.path.split("/") if part]
-    if host == "spotify.link":
-        if len(parts) != 1 or not SPOTIFY_SHORT_ID.fullmatch(parts[0]):
-            raise ValueError("Paste a valid Spotify short share link.")
-        return value.strip()
-    if len(parts) != 2 or parts[0] not in SPOTIFY_TYPES or not SPOTIFY_RESOURCE_ID.fullmatch(parts[1]):
-        raise ValueError("Paste a Spotify track, album, artist, show, episode or playlist link.")
-    return value.strip()

@@ -2,14 +2,9 @@
 
 (() => {
   const $ = (id) => document.getElementById(id);
-  const app = $("app");
-  const youtubeTab = $("youtubeTab");
-  const spotifyTab = $("spotifyTab");
   const youtubePanel = $("youtubePanel");
-  const spotifyPanel = $("spotifyPanel");
   const queue = [];
   const youtubeHosts = new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"]);
-  const spotifyHosts = new Set(["open.spotify.com", "www.spotify.com", "spotify.com", "spotify.link"]);
   const videoId = /^[A-Za-z0-9_-]{11}$/;
   const playlistId = /^[A-Za-z0-9_-]{10,80}$/;
 
@@ -42,35 +37,10 @@
     throw new Error("Use a YouTube video or playlist link.");
   }
 
-  function spotifyUrl(raw) {
-    const url = safeUrl(raw, spotifyHosts);
-    const parts = url.pathname.split("/").filter(Boolean);
-    if (url.hostname === "spotify.link") {
-      if (!parts.length) throw new Error("Paste a Spotify share link.");
-      return url.href;
-    }
-    const types = new Set(["track", "album", "artist", "playlist", "show", "episode"]);
-    if (parts.length < 2 || !types.has(parts[0]) || !/^[A-Za-z0-9_-]{8,100}$/.test(parts[1])) {
-      throw new Error("Paste a Spotify track, album, artist or playlist link.");
-    }
-    return "https://open.spotify.com/" + parts[0] + "/" + parts[1];
-  }
-
   function showStatus(id, message, isError) {
     const node = $(id);
     node.textContent = message;
     node.style.color = isError ? "#ff9292" : "";
-  }
-
-  function setSource(source) {
-    const spotify = source === "spotify";
-    app.dataset.source = spotify ? "spotify" : "youtube";
-    youtubePanel.classList.toggle("is-hidden", spotify);
-    spotifyPanel.classList.toggle("is-hidden", !spotify);
-    youtubeTab.classList.toggle("is-active", !spotify);
-    spotifyTab.classList.toggle("is-active", spotify);
-    youtubeTab.setAttribute("aria-pressed", String(!spotify));
-    spotifyTab.setAttribute("aria-pressed", String(spotify));
   }
 
   async function pasteInto(input, statusId) {
@@ -106,10 +76,7 @@
     });
   }
 
-  youtubeTab.addEventListener("click", () => setSource("youtube"));
-  spotifyTab.addEventListener("click", () => setSource("spotify"));
   $("pasteYoutube").addEventListener("click", () => pasteInto($("youtubeUrl"), "youtubeStatus"));
-  $("pasteSpotify").addEventListener("click", () => pasteInto($("spotifyUrl"), "spotifyStatus"));
 
   $("addQueue").addEventListener("click", () => {
     try {
@@ -123,16 +90,6 @@
       showStatus("youtubeStatus", "Added to preview queue. Mobile downloads are not connected yet.", false);
     } catch (error) {
       showStatus("youtubeStatus", error.message, true);
-    }
-  });
-
-  $("openSpotify").addEventListener("click", () => {
-    try {
-      const target = spotifyUrl($("spotifyUrl").value);
-      showStatus("spotifyStatus", "Opening Spotify…", false);
-      window.location.href = target;
-    } catch (error) {
-      showStatus("spotifyStatus", error.message, true);
     }
   });
 

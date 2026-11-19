@@ -23,7 +23,7 @@ Open the [Mobile native builds workflow](https://github.com/Bhaveek08/MusicVault
 adb install -r MusicVault-Android-debug.apk
 ```
 
-This installs a **UI prototype**. It can validate YouTube links, show preview queue rows, and hand official Spotify links to Android. It cannot download media.
+This installs a **UI prototype**. It can validate YouTube links and show preview queue rows. It cannot download media.
 
 ## Build the Android shell locally
 
@@ -44,7 +44,7 @@ On macOS with Xcode installed, open `ios/MusicVault.xcodeproj`, select the `Musi
 
 ## Security boundaries
 
-The WebViews load bundled local content. External navigation is restricted to official Spotify HTTPS domains; the mobile shell does not load remote YouTube pages or execute the desktop downloader. Android's INTERNET permission supports its local HTTPS WebView asset origin; the WebView blocks other network resources, file URL access, mixed content, cleartext traffic, backup, and arbitrary external navigation. Neither client requests storage permissions because downloads are not implemented.
+The WebViews load bundled local content. The mobile shell does not load remote YouTube pages or execute the desktop downloader, and blocks external navigation. Android's INTERNET permission supports its local HTTPS WebView asset origin; the WebView blocks other network resources, file URL access, mixed content, cleartext traffic, and backup. Neither client requests storage permissions because downloads are not implemented.
 
 ## Release requirements still open
 

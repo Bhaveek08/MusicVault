@@ -24,17 +24,8 @@
       <section class="intro">
         <p class="eyebrow">MEDIA WORKSPACE</p>
         <h1>Downloads</h1>
-        <p class="intro-copy">Add a video or playlist. Choose how to save it.</p>
+        <p class="intro-copy">Add a permitted video or playlist to your queue.</p>
       </section>
-
-      <nav class="source-switch" aria-label="Choose source">
-        <button class="source-tab is-active" id="youtubeTab" type="button" aria-pressed="true">
-          <span class="youtube-dot"></span>YouTube
-        </button>
-        <button class="source-tab" id="spotifyTab" type="button" aria-pressed="false">
-          <span class="spotify-dot"></span>Spotify
-        </button>
-      </nav>
 
       <section class="panel source-panel" id="youtubePanel" aria-labelledby="youtubeHeading">
         <div class="panel-heading">
@@ -74,29 +65,6 @@
           Add to queue <span aria-hidden="true">↗</span>
         </button>
         <p class="inline-status" id="youtubeStatus" role="status" aria-live="polite">Mobile downloading is not connected yet.</p>
-      </section>
-
-      <section class="panel source-panel is-hidden" id="spotifyPanel" aria-labelledby="spotifyHeading">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow source-eyebrow">TRACKS & PLAYLISTS</p>
-            <h2 id="spotifyHeading">Spotify</h2>
-          </div>
-          <span class="provider-icon spotify-icon" aria-hidden="true">●</span>
-        </div>
-        <label class="field-label" for="spotifyUrl">SPOTIFY SHARE LINK</label>
-        <div class="input-row">
-          <input id="spotifyUrl" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste Spotify link">
-          <button class="quiet-button" id="pasteSpotify" type="button">Paste</button>
-        </div>
-        <button class="primary-button spotify-action" id="openSpotify" type="button">
-          Open in Spotify <span aria-hidden="true">↗</span>
-        </button>
-        <div class="info-note">
-          <span class="info-mark">i</span>
-          <p>Playback and offline listening stay in Spotify. Protected streaming tracks are not exported.</p>
-        </div>
-        <p class="inline-status" id="spotifyStatus" role="status" aria-live="polite">Paste a Spotify share link to continue.</p>
       </section>
 
       <section class="panel queue-panel">
