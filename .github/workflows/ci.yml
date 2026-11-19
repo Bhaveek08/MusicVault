@@ -39,7 +39,7 @@ jobs:
         run: python scripts/run_release_qa.py
       - name: Upload host QA report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: musicvault-qa-${{ matrix.os }}-py${{ matrix.python-version }}
           path: QA_REPORT.md
