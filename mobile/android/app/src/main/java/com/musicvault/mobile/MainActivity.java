@@ -2,6 +2,7 @@ package com.musicvault.mobile;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
 import androidx.webkit.WebViewAssetLoader;
