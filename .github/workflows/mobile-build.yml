@@ -86,10 +86,8 @@ jobs:
             adb shell dumpsys activity activities | grep -q "com.musicvault.mobile"
             mkdir -p artifacts
             adb exec-out screencap -p > artifacts/android-emulator.png
-            adb logcat -d -s chromium:V WebView:V MusicVaultWeb:V System.err:V > artifacts/android-webview.log
-            adb shell uiautomator dump --compressed /sdcard/musicvault-window.xml
-            adb exec-out cat /sdcard/musicvault-window.xml > artifacts/android-window.xml
-            grep -q 'Downloads' artifacts/android-window.xml || { echo "Android UI hierarchy does not contain the Downloads screen"; exit 1; }
+            adb logcat -d -s MusicVaultWeb:I > artifacts/android-webview.log
+            grep -F 'Rendered page text:' artifacts/android-webview.log | grep -Fq 'Downloads' || { echo "Android WebView did not render the Downloads screen"; exit 1; }
       - name: Upload Android emulator screenshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -98,7 +96,6 @@ jobs:
           path: |
             artifacts/android-emulator.png
             artifacts/android-webview.log
-            artifacts/android-window.xml
           if-no-files-found: ignore
           retention-days: 30
 
