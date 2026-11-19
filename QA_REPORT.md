@@ -8,7 +8,7 @@ The [v2.0.6 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag
 | --- | --- | --- | --- |
 | Windows 10/11 x64 | [`MusicVault-Setup.exe`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Setup.exe) and [portable ZIP](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Windows-x64.zip) | v2.0.6 tagged release workflow pending. | Installer is unsigned. |
 | macOS Apple Silicon | [`MusicVault-macos-arm64.dmg`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-macos-arm64.dmg) | v2.0.6 tagged release workflow pending. | Unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
-| Linux x86_64 | [`MusicVault-Linux-x86_64.tar.gz`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) | v2.0.6 tagged release workflow pending. | Host Qt/X11 runtime libraries are required. |
+| Linux x86_64 | [`MusicVault-Linux-x86_64.tar.gz`](https://github.com/Bhaveek08/MusicVault/releases/latest/download/MusicVault-Linux-x86_64.tar.gz) | [Linux build 44573399720](https://github.com/Bhaveek08/MusicVault/actions/runs/44573399720) passed its portable build and smoke check. | Host Qt/X11 runtime libraries are required. |
 | Android | No production release asset | Debug APK installed and the Downloads page rendered on an Android 15/API 35 emulator in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed AAB, or Play Store build. |
 | iOS/iPadOS | No device-installable release asset | Simulator app built, installed, and launched in [run 44436830729](https://github.com/Bhaveek08/MusicVault/actions/runs/44436830729). | UI prototype only; no media engine, signed device IPA, TestFlight, or App Store build. |
 
@@ -16,9 +16,9 @@ The mobile clients validate YouTube links and stage a local preview queue. Mobil
 
 ## Regression and security checks
 
-For v2.0.6, all 58 pytest cases passed locally. Cross-platform CI and tagged release builds are pending.
+For v2.0.6, all 58 pytest cases passed locally. The six-job [CI run 44573923961](https://github.com/Bhaveek08/MusicVault/actions/runs/44573923961) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. [CodeQL run 44573924007](https://github.com/Bhaveek08/MusicVault/actions/runs/44573924007) passed. [Mobile UI run 44573924009](https://github.com/Bhaveek08/MusicVault/actions/runs/44573924009) passed, including the source-policy and interaction checks. [Native mobile build run 44573924123](https://github.com/Bhaveek08/MusicVault/actions/runs/44573924123) passed Android emulator and iOS Simulator build/launch checks.
 
-The current desktop preview shows the app window at 1200 × 900; the mobile prototype preview is touch-first at 390 × 844. Android and iOS native clients remain prototypes, as described above.
+The v2.0.6 desktop preview shows the app window at 1200 × 900; the mobile prototype preview is touch-first at 390 × 844. Android and iOS native clients remain prototypes, as described above.
 
 Test coverage includes strict YouTube URL handling and Spotify-source rejection, permission and playlist gating, invalid-input errors, clipboard success/failure, folder selection and cancellation, queue capacity and clearing, progress/failure states, download/stop control wiring, minimum-height button/card geometry, non-overlapping columns, long-path elision, format selection, output-folder validation, and downloader option constraints. Shared mobile UI tests cover each remaining interactive control and recoverable error cases.
 
