@@ -24,8 +24,8 @@ MusicVault does not bypass DRM, sign-in walls, private/member-only restrictions,
 | Windows 10/11 x64 | Desktop client and installer pipeline verified in CI | Per-user `MusicVault-Setup.exe` |
 | macOS Apple Silicon | Experimental desktop build pipeline verified in CI | `.app` + `.dmg`; unsigned and not notarized |
 | macOS Intel | Not packaged | Not currently supported as a release artifact |
-| Linux x86_64 | Portable PyInstaller build pipeline; CI smoke test pending | Portable .tar.gz bundle |
-| Android 9+ | Native WebView UI shell; debug APK + emulator smoke-test workflow | Debug APK (not Play Store signed) |
+| Linux x86_64 | Portable PyInstaller build and packaged smoke test verified in [CI run 44418085251](https://github.com/Bhaveek08/MusicVault/actions/runs/44418085251) | Temporary Actions artifact; not attached to a public release |
+| Android 7.0+ | Native WebView UI shell; debug APK and Android 15 emulator render check | Debug APK (not Play Store signed) |
 | iOS 16+ | Native SwiftUI/WKWebView shell; simulator build + launch workflow | Simulator app + Xcode project; device install needs your Apple signing team |
 
 The mobile clients share an offline-first HTML/CSS/JS UI inside native Android and iOS shells. Mobile builds currently validate links, stage a local preview queue, and hand Spotify links to Spotify. Mobile media downloads are **not enabled**: the desktop Deno/FFmpeg/yt-dlp pipeline still needs platform-specific porting, sandboxed output handling and background-task work. See [mobile workstream](mobile/README.md) and [platform support](docs/platform-support.md).
@@ -130,7 +130,7 @@ Run the repeated host QA gate:
 python scripts/run_release_qa.py
 ```
 
-Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile policy tests cover URL validation and ensure the mobile shell does not import the desktop downloader. The [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) renders the actual Qt widgets under Xvfb and generates four desktop/mobile UI screenshots as a review artifact. These are still desktop-hosted checks, not physical-phone or emulator tests. Android deployment is currently blocked by Qt's commercial-license credential gate; iOS target wheels/signing are not provisioned.
+Set `MUSICVAULT_QA_RUNS` to a number from 1 to 200 to override the default. The runner identifies the host where it executes; repeated host tests are not a substitute for real-device testing. Mobile policy tests cover URL validation, all seven shared WebView buttons and their error states, and ensure the mobile shell does not import the desktop downloader. The [Mobile UI workflow](https://github.com/Bhaveek08/MusicVault/actions/workflows/mobile.yml) renders the actual Qt widgets under Xvfb and generates four desktop/mobile UI screenshots as a review artifact. Native Android emulator and iOS Simulator checks run separately; these do not prove physical-device downloads or store readiness.
 
 ## Security model
 

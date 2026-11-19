@@ -5,9 +5,9 @@
 | Platform | UI/runtime status | Package status | Release status |
 | --- | --- | --- | --- |
 | Windows 10/11 x64 | PySide6 desktop downloader | Inno Setup per-user installer | Build and packaged smoke test verified in CI; unsigned |
-| macOS Apple Silicon | PySide6 desktop downloader | `.app` + `.dmg` | Build and packaged smoke test verified in CI; unsigned/notarized |
+| macOS Apple Silicon | PySide6 desktop downloader | `.app` + `.dmg` | Build and packaged smoke test verified in CI; unsigned and not notarized |
 | macOS Intel | Not packaged | None | Not currently supported as a release artifact |
-| Linux | Source/test environment only | None | No native installer |
+| Linux | PySide6 desktop downloader | Portable `.tar.gz` Actions artifact | Build and packaged smoke test verified in [CI run 44418085251](https://github.com/Bhaveek08/MusicVault/actions/runs/44418085251); not attached to a public release |
 | Android | Native Java WebView shell using shared local HTML/CSS/JS; download UI is preview-only | Debug APK installed and rendered the Downloads screen on an Android 15/API 35 emulator in [run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433); test artifact retained 30 days | Prototype only; not a public release |
 | iOS/iPadOS | Native SwiftUI/WKWebView shell using shared local HTML/CSS/JS; download UI is preview-only | Unsigned iOS Simulator app built, installed, and launched in [run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433); no device IPA | Prototype only; not a public release |
 
