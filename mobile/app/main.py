@@ -199,7 +199,7 @@ class MusicVaultMobileWindow(QWidget):
 
         self.playlist_check = QCheckBox("Include full playlist")
         card_layout.addWidget(self.playlist_check)
-        self.rights_check = QCheckBox("I can save this content")
+        self.rights_check = QCheckBox("The source permits this save")
         card_layout.addWidget(self.rights_check)
 
         self.add_button = AnimatedButton("Add to queue")
@@ -256,7 +256,7 @@ class MusicVaultMobileWindow(QWidget):
         try:
             kind = validate_youtube_link(self.youtube_input.text())
             if not self.rights_check.isChecked():
-                raise ValueError("Confirm that you can save this content.")
+                raise ValueError("Confirm that the source permits this save.")
             if kind == "playlist" and not self.playlist_check.isChecked():
                 raise ValueError("Turn on full playlist for a playlist-only link.")
             label = f"YouTube · {self.format_combo.currentText()} · {kind.title()}"

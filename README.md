@@ -9,7 +9,7 @@ MusicVault provides a single desktop window for managing permitted YouTube media
 
 ## Features
 
-- **YouTube:** queue supported public videos and playlists that you own or are authorized to save, subject to platform rules and availability.
+- **YouTube:** queue supported public videos and playlists only when the source service and relevant rights holders authorize saving them.
 - **Spotify:** validate and open official track, album, artist, or playlist links. Protected streaming tracks are not exported to MP3/WAV files.
 - **Formats:** MP3, WAV, FLAC, M4A, AAC, OPUS, and MKV. Lossy audio exports target 320 kbps where supported; source quality remains the limit.
 - **Workflow:** playlist opt-in, queue management, progress, cancellation, remembered output folder, and collision-safe filenames.

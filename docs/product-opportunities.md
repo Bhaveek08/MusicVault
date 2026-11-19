@@ -18,6 +18,14 @@ This is an initial product hypothesis list, not proof that any idea will earn mo
 
 These links indicate competing products and feature expectations; they do not establish customer willingness to pay. Before development, interview 10–15 people in the target segment, test the main workflow with a clickable prototype, and ask what they currently use and what they would pay to avoid. Record the findings and a stop/go threshold.
 
+## Demand signals checked 2026-11-19
+
+- **Pantry & Expiry Companion has the clearest quantified pain signal so far.** The U.S. EPA's April 2025 estimate puts consumer food waste at $728 per person each year and $2,913 for a household of four, about 11% of food spending. This supports the problem's scale in the United States; it does not show that a pantry-tracking app prevents that loss or that users will pay for one. See the [EPA report summary](https://www.epa.gov/land-research/estimating-cost-food-waste-american-consumers).
+- **Home Admin Vault has many direct competitors.** Google Play listings already describe local receipt, warranty, and home-inventory trackers with PDF/export, reminders, and optional paid backup or unlocks ([My Warranty](https://play.google.com/store/apps/details?id=com.householdapps.homeinventory), [Keepsake](https://play.google.com/store/apps/details?hl=en-US&id=home.inventory.belongings.insurance.warranty.tracker), [Value Guard](https://play.google.com/store/apps/details?id=com.eazyverse.valueguard)). The opportunity needs a tested wedge such as household document intake and recurring home-service records; adding another inventory list is not enough.
+- **Pantry apps are also crowded and converge on similar features.** Current listings emphasize local records, expiry alerts, quantity tracking, and optional ads or in-app purchases ([Pantry Expiration Tracker](https://play.google.com/store/apps/details?id=com.blewettproductsystems.bpi_usefirst), [Pantry Tracker](https://play.google.com/store/apps/details?id=com.cascadiacreations.pantrytracker)). A new product should test faster entry, reliable reminders, and useful household coordination before building barcode catalogs or AI meal planning.
+
+These signals are research inputs, not customer validation. Store pages are developer-authored descriptions, and public listing presence does not establish active use, retention, or willingness to pay. The next validation step remains interviews and a task-based prototype test.
+
 ## Monetization and distribution constraints
 
 Keep the useful core open and usable without an account. Charge for ongoing costs such as hosted sync, encrypted backup, shared household spaces, or support; do not sell personal documents, transaction data, or attention through intrusive ads. Offer a portable export and a self-host option if the architecture supports it.

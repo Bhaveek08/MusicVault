@@ -30,6 +30,10 @@ Automated URL-policy tests run on desktop CI hosts. Real Qt prototype screenshot
 
 The mobile scope must preserve the desktop source policy: Spotify share links can open in the official app, but protected Spotify streams must not be exported as local media files. YouTube downloads must only be enabled for content the user is permitted to save and where applicable platform rules allow it.
 
+### Third-party source authorization is a release gate
+
+YouTube's [Terms of Service](https://www.youtube.com/t/terms) restrict downloading Service content except where the Service expressly authorizes it, the relevant rights holders give prior written permission, or applicable law permits it. Apple's [App Review Guideline 5.2.3](https://developer.apple.com/app-store/review/guidelines/#intellectual-property) specifically addresses saving, converting, or downloading third-party audio/video and requires explicit authorization from the source. Google Play's [Intellectual Property policy](https://support.google.com/googleplay/android-developer/answer/9888072) prohibits infringement and apps that encourage it. A user's confirmation that they own a video does not, by itself, demonstrate authorization from the source service. Before adding a mobile download engine or submitting a store build, document the authorized source/API pathway; otherwise keep mobile focused on user-imported files and official service handoff.
+
 ## Mobile release gates
 
 Before Android or iOS can be called supported:

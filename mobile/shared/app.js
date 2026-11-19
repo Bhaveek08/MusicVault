@@ -114,7 +114,7 @@
   $("addQueue").addEventListener("click", () => {
     try {
       const kind = youtubeKind($("youtubeUrl").value);
-      if (!$("permission").checked) throw new Error("Confirm that you can save this content.");
+      if (!$("permission").checked) throw new Error("Confirm that the source permits this save.");
       if (kind === "Playlist" && !$("playlist").checked) throw new Error("Enable Full playlist for this link.");
       if (queue.length >= 50) throw new Error("The preview queue is full.");
       queue.push({kind, format: $("format").value, source: "YouTube"});

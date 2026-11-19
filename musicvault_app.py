@@ -233,7 +233,7 @@ class MusicVaultWindow(QMainWindow):
         row.addWidget(paste)
         source_layout.addLayout(row)
 
-        self.permission_check = QCheckBox("I own this content or have permission to save it.")
+        self.permission_check = QCheckBox("The source and rights holders permit this save.")
         self.permission_check.setObjectName("PermissionCheck")
         source_layout.addWidget(self.permission_check)
         ybox.addWidget(source_card)
@@ -506,7 +506,7 @@ class MusicVaultWindow(QMainWindow):
         try:
             source = validate_source_url(self.url_input.text())
             if not self.permission_check.isChecked():
-                raise ValueError("Confirm that you own this content or have permission to save it.")
+                raise ValueError("Confirm the source permits this save and you have any required rights-holder permission.")
             if source.is_playlist_only and not self.playlist_check.isChecked():
                 raise ValueError("Enable Full playlist for a playlist-only link.")
             if len(self.jobs) >= 100:
