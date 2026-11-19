@@ -1,8 +1,8 @@
-# MusicVault 2.0.3 — QA report
+# MusicVault 2.0.4 — QA report
 
 ## Release downloads
 
-The [v2.0.3 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.3) provides direct desktop downloads:
+The [v2.0.4 GitHub Release](https://github.com/Bhaveek08/MusicVault/releases/tag/v2.0.4) provides direct desktop downloads:
 
 | Platform | Asset | Verification | Distribution caveat |
 | --- | --- | --- | --- |
@@ -16,11 +16,11 @@ The mobile clients validate links, stage a local preview queue, and hand officia
 
 ## Regression and security checks
 
-The six-job [CI run 44478916414](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916414) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. The suite contains 85 pytest cases and ran for 50 repetitions per job. A separate local Windows QA run also passed 50 consecutive repetitions. The [CodeQL run 44478916468](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916468) passed.
+For the v2.0.4 source, all 86 pytest cases passed locally and the release QA runner passed 50 consecutive runs on Windows. The previous v2.0.3 six-job [CI run 44478916414](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916414) passed on Windows, macOS 15, and Ubuntu with Python 3.11 and 3.13. The [CodeQL run 44478916468](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916468) also passed for that earlier source revision.
 
-The [Mobile UI run 44478916403](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916403) passed source-policy checks, shared WebView button/error interaction checks on Windows and Ubuntu, target-readiness checks, and rendered current UI previews. The desktop screenshots show the visible app window at 1200 × 820; mobile previews are touch-first at 390 × 844.
+The [Mobile UI run 44478916403](https://github.com/Bhaveek08/MusicVault/actions/runs/44478916403) passed source-policy checks, shared WebView button/error interaction checks on Windows and Ubuntu, and target-readiness checks for the previous source revision. Current desktop UI previews show the visible app window at 1200 × 900; mobile previews are touch-first at 390 × 844.
 
-Test coverage includes strict YouTube and Spotify URL handling, permission and playlist gating, invalid-input errors, clipboard success/failure, folder selection and cancellation, queue capacity and clearing, progress/failure states, download/stop control wiring, button geometry, non-overlapping columns, long-path elision, format selection, output-folder validation, and downloader option constraints. The shared mobile UI tests cover all seven interactive controls and recoverable error cases.
+Test coverage includes strict YouTube and Spotify URL handling, permission and playlist gating, invalid-input errors, clipboard success/failure, folder selection and cancellation, queue capacity and clearing, progress/failure states, download/stop control wiring, authorized-storefront link actions, minimum-height button/card geometry, non-overlapping columns, long-path elision, format selection, output-folder validation, and downloader option constraints. The shared mobile UI tests cover all seven interactive controls and recoverable error cases.
 
 ## Limits
 

@@ -55,11 +55,11 @@ def click_button(window, label):
 
 
 def test_empty_window_controls_and_layout_fit_supported_minimum(window):
-    window.resize(980, 760)
+    window.resize(980, 820)
     QApplication.processEvents()
     root = window.centralWidget()
     assert window.size().width() >= 980
-    assert window.size().height() >= 760
+    assert window.size().height() >= 820
     for button in window.findChildren(QPushButton):
         if button.isVisible():
             top_left = button.mapTo(root, button.rect().topLeft())
@@ -67,6 +67,9 @@ def test_empty_window_controls_and_layout_fit_supported_minimum(window):
             assert top_left.y() >= 0
             assert top_left.x() + button.width() <= root.width()
             assert top_left.y() + button.height() <= root.height()
+    settings_card = window.findChild(QFrame, "ExportSettingsCard")
+    card_origin = settings_card.mapTo(root, settings_card.rect().topLeft())
+    assert card_origin.y() + settings_card.height() <= root.height()
     assert not window.download_button.isEnabled()
     assert not window.stop_button.isEnabled()
     assert window.queue_stack.currentIndex() == 0
@@ -138,7 +141,11 @@ def test_spotify_tab_and_open_link_action(window, monkeypatch, warnings):
     assert window.statusBar().currentMessage() == "Spotify link hand-off"
 
     opened = []
-    monkeypatch.setattr(musicvault_app.QDesktopServices, "openUrl", lambda url: opened.append(url.toString()) or True)
+    monkeypatch.setattr(
+        musicvault_app.QDesktopServices,
+        "openUrl",
+        lambda url: opened.append(url.toString()) or True,
+    )
     window.spotify_input.setText("https://open.spotify.com/track/1234567890123456789012")
     click_button(window, "Open in Spotify")
     assert opened == ["https://open.spotify.com/track/1234567890123456789012"]
@@ -154,6 +161,16 @@ def test_spotify_open_failure_shows_recoverable_error(window, monkeypatch, warni
     window.spotify_input.setText("https://open.spotify.com/track/1234567890123456789012")
     click_button(window, "Open in Spotify")
     assert "Could not open Spotify" in warnings[-1]
+
+
+def test_authorized_music_source_buttons_open_official_sites(window, monkeypatch):
+    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
+    QApplication.processEvents()
+    opened = []
+    monkeypatch.setattr(musicvault_app.QDesktopServices, "openUrl", lambda url: opened.append(url.toString()) or True)
+    click_button(window, "Explore Bandcamp")
+    click_button(window, "Explore SoundCloud")
+    assert opened == ["https://bandcamp.com/", "https://soundcloud.com/"]
 
 
 def test_queue_state_updates_progress_and_error(window):

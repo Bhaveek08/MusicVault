@@ -152,8 +152,8 @@ class MusicVaultWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} — Downloads")
-        self.setMinimumSize(980, 760)
-        self.resize(1120, 840)
+        self.setMinimumSize(980, 820)
+        self.resize(1120, 900)
         self.jobs: list[Job] = []
         self.worker: Worker | None = None
         self.cancel_event = threading.Event()
@@ -181,8 +181,8 @@ class MusicVaultWindow(QMainWindow):
         root.setObjectName("Root")
         self.setCentralWidget(root)
         outer = QVBoxLayout(root)
-        outer.setContentsMargins(28, 20, 28, 14)
-        outer.setSpacing(16)
+        outer.setContentsMargins(30, 22, 30, 16)
+        outer.setSpacing(19)
 
         # Compact app header.
         header = QHBoxLayout()
@@ -206,7 +206,7 @@ class MusicVaultWindow(QMainWindow):
         header.addLayout(brand_stack)
         header.addStretch(1)
 
-        local_badge = QLabel("●  LOCAL LIBRARY")
+        local_badge = QLabel("●  ON-DEVICE LIBRARY")
         local_badge.setObjectName("LocalBadge")
         header.addWidget(local_badge)
         version = QLabel(APP_VERSION)
@@ -222,11 +222,14 @@ class MusicVaultWindow(QMainWindow):
         left_column.setSpacing(18)
 
         intro = QVBoxLayout()
-        intro.setSpacing(7)
+        intro.setSpacing(6)
+        intro_eyebrow = QLabel("YOUR MUSIC, ORGANIZED")
+        intro_eyebrow.setObjectName("HeroEyebrow")
+        intro.addWidget(intro_eyebrow)
         page_title = QLabel("Downloads")
         page_title.setObjectName("PageTitle")
         intro.addWidget(page_title)
-        page_hint = QLabel("Add a YouTube link or open a Spotify share link.")
+        page_hint = QLabel("A calm home for the audio you’re allowed to keep.")
         page_hint.setObjectName("Hint")
         intro.addWidget(page_hint)
         left_column.addLayout(intro)
@@ -356,15 +359,33 @@ class MusicVaultWindow(QMainWindow):
         spotify_actions.addWidget(open_button)
         spotify_layout.addLayout(spotify_actions)
 
-        note = QLabel("Spotify handles playback and offline listening. Protected streaming tracks are not exported.")
-        note.setObjectName("Hint")
+        note = QLabel("Spotify keeps playback and offline listening in its app. MusicVault can’t export Spotify streams. For files, use an artist-authorized download, such as a Bandcamp purchase or a SoundCloud track with downloads enabled.")
+        note.setObjectName("SpotifyNote")
         note.setWordWrap(True)
         spotify_layout.addWidget(note)
         sbox.addWidget(spotify_card)
+        sources_card, sources_layout = self._card("Downloadable music")
+        sources_hint = QLabel("Get files directly from artists and authorized storefronts.")
+        sources_hint.setObjectName("Hint")
+        sources_layout.addWidget(sources_hint)
+        source_links = QHBoxLayout()
+        source_links.setSpacing(8)
+        bandcamp_button = MotionButton("Explore Bandcamp")
+        bandcamp_button.setObjectName("SecondaryButton")
+        bandcamp_button.setMinimumHeight(44)
+        bandcamp_button.clicked.connect(lambda: self._open_music_source("https://bandcamp.com/"))
+        source_links.addWidget(bandcamp_button)
+        soundcloud_button = MotionButton("Explore SoundCloud")
+        soundcloud_button.setObjectName("SecondaryButton")
+        soundcloud_button.setMinimumHeight(44)
+        soundcloud_button.clicked.connect(lambda: self._open_music_source("https://soundcloud.com/"))
+        source_links.addWidget(soundcloud_button)
+        sources_layout.addLayout(source_links)
+        sbox.addWidget(sources_card)
         sbox.addStretch(1)
 
-        tabs.addTab(youtube, "YouTube")
-        tabs.addTab(spotify, "Spotify")
+        tabs.addTab(youtube, "YouTube  ·  authorized sources")
+        tabs.addTab(spotify, "Spotify  ·  listening")
         tabs.currentChanged.connect(self._tab_changed)
         left_column.addWidget(tabs, 1)
         columns.addLayout(left_column, 7)
@@ -387,7 +408,7 @@ class MusicVaultWindow(QMainWindow):
         queue_layout.addLayout(queue_header)
 
         self.queue_stack = QStackedWidget()
-        self.queue_empty = QLabel("Nothing queued yet\n\nAdd a YouTube link to get started.")
+        self.queue_empty = QLabel("Your queue is clear\n\nAdd an authorized source to get started.")
         self.queue_empty.setObjectName("EmptyState")
         self.queue_empty.setAlignment(Qt.AlignCenter)
         self.queue_empty.setWordWrap(True)
@@ -447,25 +468,28 @@ class MusicVaultWindow(QMainWindow):
 
     def _apply_style(self) -> None:
         self.setStyleSheet("""
-            QMainWindow, QWidget#Root { background:#0A0C10; color:#F4F6F8; }
+            QMainWindow, QWidget#Root { background:#090B0E; color:#F4F6F8; }
             QWidget { color:#F4F6F8; font-family:'Segoe UI',Arial,sans-serif; font-size:10pt; }
-            QLabel#Brand { font-size:19pt; font-weight:750; letter-spacing:0.1px; color:#FFFFFF; }
-            QLabel#PageTitle { font-size:25pt; font-weight:740; letter-spacing:-0.4px; color:#FFFFFF; }
-            QLabel#Eyebrow { color:#A6B0BD; font-size:9pt; font-weight:700; letter-spacing:0.9px; }
-            QLabel#Version, QLabel#Hint, QLabel#PathLabel, QLabel#Footer { color:#A6B0BD; }
+            QLabel#Brand { font-size:20pt; font-weight:760; letter-spacing:0.1px; color:#FFFFFF; }
+            QLabel#PageTitle { font-size:28pt; font-weight:760; letter-spacing:-0.6px; color:#FFFFFF; }
+            QLabel#HeroEyebrow { color:#E7777E; font-size:8pt; font-weight:750; letter-spacing:1.5px; }
+            QLabel#Eyebrow { color:#A8B2C0; font-size:8pt; font-weight:720; letter-spacing:1.1px; }
+            QLabel#Version, QLabel#Hint, QLabel#PathLabel, QLabel#Footer { color:#A8B2C0; }
             QLabel#Hint { font-size:10pt; }
             QLabel#Footer { font-size:9pt; }
-            QLabel#LocalBadge { background:#142019; color:#B6EBCB; border:1px solid #31533E;
-                                border-radius:11px; padding:9px 12px; font-size:9pt; font-weight:700; }
-            QLabel#SectionTitle { font-size:13pt; font-weight:720; color:#F7F8FA; }
-            QLabel#QueueCount { color:#A6B0BD; font-size:9pt; font-weight:700; letter-spacing:0.7px; }
-            QLabel#EmptyState { color:#B5C0CE; background:#0E1218; border:1px dashed #394454;
-                                border-radius:14px; padding:24px; font-size:10pt; }
-            QLabel#FormatPill { background:#1B222C; border:1px solid #344050; color:#D3DBE5;
-                                border-radius:9px; padding:8px 5px; font-size:9pt; font-weight:700; }
-            QFrame[musicVaultCard="true"] { background:#141820; border:1px solid #2B333F; border-radius:17px; }
+            QLabel#LocalBadge { background:#14221B; color:#BCE8CB; border:1px solid #315B40;
+                                border-radius:12px; padding:10px 14px; font-size:8pt; font-weight:730; }
+            QLabel#SectionTitle { font-size:14pt; font-weight:740; color:#F7F8FA; }
+            QLabel#QueueCount { color:#B7C1CE; font-size:8pt; font-weight:730; letter-spacing:1px; }
+            QLabel#EmptyState { color:#B8C2CF; background:#0D1116; border:1px dashed #343E4B;
+                                border-radius:16px; padding:24px; font-size:10pt; }
+            QLabel#SpotifyNote { color:#C2CBD6; background:#0F1713; border:1px solid #263B2F;
+                                 border-radius:12px; padding:14px; font-size:9pt; }
+            QLabel#FormatPill { background:#171E27; border:1px solid #303B49; color:#DDE4EC;
+                                border-radius:10px; padding:9px 5px; font-size:9pt; font-weight:720; }
+            QFrame[musicVaultCard="true"] { background:#12161C; border:1px solid #28313C; border-radius:19px; }
             QLineEdit, QComboBox, QListWidget {
-                background:#0E1218; border:1px solid #354050; border-radius:11px;
+                background:#0D1116; border:1px solid #303B48; border-radius:12px;
                 padding:11px 13px; color:#F4F6F8; selection-background-color:#364354;
             }
             QLineEdit:focus, QComboBox:focus { border:2px solid #899DB6; background:#111720; }
@@ -479,17 +503,17 @@ class MusicVaultWindow(QMainWindow):
             QTabWidget#SourceTabs::pane { border:0; background:transparent; top:0; }
             QTabWidget#SourceTabs::tab-bar { background:transparent; }
             QTabBar { background:transparent; }
-            QTabBar::tab { min-width:112px; color:#B0BAC7; background:#161B23;
-                           padding:12px 22px; margin-right:8px; border:1px solid #303A47;
-                           border-radius:11px; font-weight:680; }
-            QTabBar::tab:selected { color:#FFFFFF; background:#32191E; border-color:#82434B; }
-            QTabBar::tab:hover:!selected { color:#F0F3F6; background:#222A35; }
+            QTabBar::tab { min-width:112px; color:#AEB9C7; background:#11151B;
+                           padding:13px 18px; margin-right:8px; border:1px solid #27303B;
+                           border-radius:12px; font-weight:690; }
+            QTabBar::tab:selected { color:#FFFFFF; background:#261619; border-color:#714047; }
+            QTabBar::tab:hover:!selected { color:#F0F3F6; background:#1A2029; }
             QPushButton { color:#F4F6F8; border:1px solid transparent; border-radius:11px;
                           padding:6px 14px; font-weight:700; min-height:22px; }
             QPushButton:focus { border:2px solid #F4F6F8; }
             QPushButton:disabled { background:#242A33; color:#8C96A4; border-color:#303844; }
-            QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; border-color:#E74D56; }
-            QPushButton#YoutubeButton:hover { background:#EA454D; }
+            QPushButton#YoutubeButton { background:#D93A44; color:#FFFFFF; border-color:#E75058; }
+            QPushButton#YoutubeButton:hover { background:#E64952; }
             QPushButton#YoutubeButton:pressed { background:#BA2D36; }
             QPushButton#SpotifyButton { background:#16864A; color:#FFFFFF; border-color:#29985B; }
             QPushButton#SpotifyButton:hover { background:#1A9654; }
@@ -503,7 +527,7 @@ class MusicVaultWindow(QMainWindow):
             QListWidget::item:selected { background:#242D39; border-radius:7px; }
             QProgressBar { background:#252C36; border:0; border-radius:4px; height:8px; }
             QProgressBar::chunk { background:#D93640; border-radius:4px; }
-            QStatusBar { color:#A6B0BD; background:#0A0C10; border-top:1px solid #252C36; }
+            QStatusBar { color:#A8B2C0; background:#090B0E; border-top:1px solid #202630; }
         """)
 
     def _tab_changed(self, index: int) -> None:
@@ -560,6 +584,10 @@ class MusicVaultWindow(QMainWindow):
             self.statusBar().showMessage("Opened in Spotify", 3000)
         except Exception as exc:
             QMessageBox.warning(self, APP_NAME, str(exc))
+
+    def _open_music_source(self, url: str) -> None:
+        if not QDesktopServices.openUrl(QUrl(url)):
+            QMessageBox.warning(self, APP_NAME, "Could not open your browser. Please try again.")
 
     def _update_queue(self) -> None:
         self.queue_count.setText(f"{len(self.jobs)} ITEMS")

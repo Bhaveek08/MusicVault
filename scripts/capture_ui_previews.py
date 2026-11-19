@@ -64,11 +64,11 @@ def main() -> int:
 
     desktop_youtube = MusicVaultWindow()
     desktop_youtube.folder_label.set_full_text("~/Music/MusicVault")
-    render(desktop_youtube, args.output / "desktop-youtube.png", QSize(1200, 820), desktop_tab=0)
+    render(desktop_youtube, args.output / "desktop-youtube.png", QSize(1200, 900), desktop_tab=0)
 
     desktop_spotify = MusicVaultWindow()
     desktop_spotify.folder_label.set_full_text("~/Music/MusicVault")
-    render(desktop_spotify, args.output / "desktop-spotify.png", QSize(1200, 820), desktop_tab=1)
+    render(desktop_spotify, args.output / "desktop-spotify.png", QSize(1200, 900), desktop_tab=1)
 
     mobile_youtube = MusicVaultMobileWindow()
     render(mobile_youtube, args.output / "mobile-prototype-youtube.png", QSize(390, 844), mobile_source="youtube")

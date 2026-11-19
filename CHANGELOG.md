@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.4 — 2026-11-19
+
+- Refresh the desktop interface with stronger hierarchy, calmer surfaces, more generous spacing, and a higher minimum window height to prevent clipping.
+- Clarify that Spotify links open in Spotify and that protected streams cannot be exported.
+- Add direct links to Bandcamp and SoundCloud as destinations for artist-authorized downloads.
+- Update desktop UI previews and add regression checks for minimum-height layout and authorized-source links.
+
 ## 2.0.3 — 2026-11-19
 
 - Add the verified Linux x86_64 portable build to versioned GitHub Releases.
