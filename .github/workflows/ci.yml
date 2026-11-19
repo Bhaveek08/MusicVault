@@ -20,9 +20,9 @@ jobs:
         python-version: ["3.11", "3.13"]
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -39,7 +39,7 @@ jobs:
         run: python scripts/run_release_qa.py
       - name: Upload host QA report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: musicvault-qa-${{ matrix.os }}-py${{ matrix.python-version }}
           path: QA_REPORT.md

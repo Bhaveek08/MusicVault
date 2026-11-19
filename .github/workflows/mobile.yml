@@ -30,11 +30,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Install test dependencies
@@ -50,8 +50,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Install X11 and Qt runtime libraries
@@ -63,7 +63,7 @@ jobs:
       - name: Render current UI screenshots using virtual X11
         run: xvfb-run -a python scripts/capture_ui_previews.py --output artifacts/ui-preview
       - name: Upload UI preview images
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: musicvault-ui-previews
           path: artifacts/ui-preview/*.png
@@ -108,8 +108,8 @@ jobs:
     name: iOS shared UI host checks
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Verify Xcode and iOS Simulator SDK

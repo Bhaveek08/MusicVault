@@ -7,6 +7,7 @@
 - Clarify that mobile builds are UI prototypes, not media downloader releases.
 - Clarify the source and rights-holder authorization confirmation in the desktop UI.
 - Expand desktop interaction coverage for paste, folder selection, queue errors, download, and stop actions.
+- Upgrade GitHub Actions workflows to current Node.js 24-compatible action releases.
 
 ## 2.0.2 — 2026-11-19
 
