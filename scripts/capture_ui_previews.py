@@ -6,12 +6,14 @@ import os
 import sys
 from pathlib import Path
 
+from PySide6.QtCore import QSize, Qt
+
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QColor, QPixmap
+from PySide6.QtGui import QPixmap
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QTabWidget
 
 from musicvault_app import MusicVaultWindow
@@ -30,12 +32,20 @@ def render(widget, output: Path, size: QSize, *, desktop_tab: int | None = None,
 
     widget.show()
     QApplication.processEvents()
+    QTest.qWait(450)
     widget.repaint()
     QApplication.processEvents()
 
-    image = QPixmap(widget.size())
-    image.fill(QColor("#080808"))
-    widget.render(image)
+    screen = QApplication.primaryScreen()
+    image = screen.grabWindow(widget.winId()) if screen is not None else QPixmap()
+    if image.isNull():
+        raise RuntimeError("Could not capture the visible MusicVault window.")
+    if image.size() != widget.size():
+        image = image.scaled(
+            widget.size(),
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
     output.parent.mkdir(parents=True, exist_ok=True)
     if not image.save(str(output), "PNG"):
         raise RuntimeError(f"Could not save UI preview to {output}")
@@ -53,11 +63,11 @@ def main() -> int:
     app.setApplicationName("MusicVault UI Preview")
 
     desktop_youtube = MusicVaultWindow()
-    desktop_youtube.folder_label.setText("~/Music/MusicVault")
+    desktop_youtube.folder_label.set_full_text("~/Music/MusicVault")
     render(desktop_youtube, args.output / "desktop-youtube.png", QSize(1200, 820), desktop_tab=0)
 
     desktop_spotify = MusicVaultWindow()
-    desktop_spotify.folder_label.setText("~/Music/MusicVault")
+    desktop_spotify.folder_label.set_full_text("~/Music/MusicVault")
     render(desktop_spotify, args.output / "desktop-spotify.png", QSize(1200, 820), desktop_tab=1)
 
     mobile_youtube = MusicVaultMobileWindow()

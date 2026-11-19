@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 import shiboken6
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QPushButton, QTabWidget
+from PySide6.QtWidgets import QApplication, QFileDialog, QFrame, QMessageBox, QPushButton, QTabWidget
 
 import musicvault_app
 from musicvault_app import MusicVaultWindow
@@ -70,6 +70,26 @@ def test_empty_window_controls_and_layout_fit_supported_minimum(window):
     assert not window.download_button.isEnabled()
     assert not window.stop_button.isEnabled()
     assert window.queue_stack.currentIndex() == 0
+
+
+def test_desktop_columns_do_not_overlap_at_preview_size(window):
+    window.resize(1200, 820)
+    QApplication.processEvents()
+    root = window.centralWidget()
+    tabs = window.findChild(QTabWidget, "SourceTabs")
+    queue_card = window.findChild(QFrame, "QueueCard")
+    tabs_origin = tabs.mapTo(root, tabs.rect().topLeft())
+    queue_origin = queue_card.mapTo(root, queue_card.rect().topLeft())
+    assert tabs_origin.x() + tabs.width() <= queue_origin.x()
+
+
+def test_long_save_path_is_elided_and_available_in_tooltip(window):
+    long_path = "C:\\Users\\ADMIN\\Music\\" + "very-long-folder-name\\" * 14 + "MusicVault"
+    window.folder_label.set_full_text(long_path)
+    QApplication.processEvents()
+    assert window.folder_label.full_text == long_path
+    assert window.folder_label.toolTip() == long_path
+    assert "…" in window.folder_label.text()
 
 
 def test_add_requires_permission_and_valid_source(window, warnings):
@@ -175,7 +195,7 @@ def test_change_folder_button_updates_path_and_persists_setting(window, tmp_path
     monkeypatch.setattr(QFileDialog, "getExistingDirectory", lambda *_args: str(selected))
     click_button(window, "Change")
     assert window.output_dir == str(selected.resolve())
-    assert window.folder_label.text() == str(selected.resolve())
+    assert window.folder_label.full_text == str(selected.resolve())
     assert window.settings.value("output_dir") == str(selected.resolve())
 
 

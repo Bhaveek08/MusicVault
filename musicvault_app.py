@@ -8,13 +8,13 @@ import threading
 import shiboken6
 from dataclasses import dataclass
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, Signal
-from PySide6.QtGui import QDesktopServices, QIcon
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QSettings, QThread, QTimer, Qt, QUrl, Signal
+from PySide6.QtGui import QDesktopServices, QFontMetrics, QIcon
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout,
     QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QStackedWidget,
     QProgressBar, QPushButton, QTabWidget, QVBoxLayout, QWidget, QGraphicsOpacityEffect,
+    QSizePolicy,
 )
 
 from musicvault_core import (
@@ -119,6 +119,35 @@ class MotionButton(QPushButton):
         self._fade.start()
 
 
+class ElidedPathLabel(QLabel):
+    """Show long output paths without letting them push over adjacent controls."""
+
+    def __init__(self, text: str, parent=None):
+        self.full_text = text
+        super().__init__(parent)
+        self.setObjectName("PathLabel")
+        self.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self.setWordWrap(False)
+        self.setMinimumWidth(0)
+        self.setMinimumHeight(36)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self.set_full_text(text)
+
+    def set_full_text(self, text: str) -> None:
+        self.full_text = text
+        self.setToolTip(text)
+        self._update_elided_text()
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._update_elided_text()
+
+    def _update_elided_text(self) -> None:
+        metrics = QFontMetrics(self.font())
+        text = metrics.elidedText(self.full_text, Qt.TextElideMode.ElideMiddle, self.contentsRect().width())
+        QLabel.setText(self, text)
+
+
 class MusicVaultWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -138,6 +167,7 @@ class MusicVaultWindow(QMainWindow):
     def _card(self, title: str) -> tuple[QFrame, QVBoxLayout]:
         card = QFrame()
         card.setObjectName("Card")
+        card.setProperty("musicVaultCard", True)
         layout = QVBoxLayout(card)
         layout.setContentsMargins(20, 18, 20, 18)
         layout.setSpacing(14)
@@ -212,6 +242,7 @@ class MusicVaultWindow(QMainWindow):
         ybox.setSpacing(16)
 
         source_card, source_layout = self._card("YouTube")
+        source_card.setObjectName("YouTubeCard")
         source_hint = QLabel("Paste a video or playlist URL")
         source_hint.setObjectName("Hint")
         source_layout.addWidget(source_hint)
@@ -239,6 +270,7 @@ class MusicVaultWindow(QMainWindow):
         ybox.addWidget(source_card)
 
         settings_card, settings_layout = self._card("Export settings")
+        settings_card.setObjectName("ExportSettingsCard")
         settings_row = QHBoxLayout()
         settings_row.setSpacing(12)
 
@@ -272,12 +304,7 @@ class MusicVaultWindow(QMainWindow):
         folder_caption = QLabel("SAVE LOCATION")
         folder_caption.setObjectName("Eyebrow")
         folder_stack.addWidget(folder_caption)
-        self.folder_label = QLabel(self.output_dir)
-        self.folder_label.setObjectName("PathLabel")
-        self.folder_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.folder_label.setWordWrap(False)
-        self.folder_label.setMinimumHeight(36)
-        self.folder_label.setToolTip(self.output_dir)
+        self.folder_label = ElidedPathLabel(self.output_dir)
         folder_stack.addWidget(self.folder_label)
         folder_row.addLayout(folder_stack, 1)
 
@@ -303,6 +330,7 @@ class MusicVaultWindow(QMainWindow):
         sbox.setSpacing(14)
 
         spotify_card, spotify_layout = self._card("Spotify")
+        spotify_card.setObjectName("SpotifyCard")
         spotify_hint = QLabel("Open a track, album, artist or playlist")
         spotify_hint.setObjectName("Hint")
         spotify_layout.addWidget(spotify_hint)
@@ -346,6 +374,7 @@ class MusicVaultWindow(QMainWindow):
         right_column.setSpacing(16)
 
         queue_card, queue_layout = self._card("Download queue")
+        queue_card.setObjectName("QueueCard")
         queue_header = QHBoxLayout()
         self.queue_count = QLabel("0 ITEMS")
         self.queue_count.setObjectName("QueueCount")
@@ -395,6 +424,7 @@ class MusicVaultWindow(QMainWindow):
         right_column.addWidget(queue_card, 1)
 
         formats_card, formats_layout = self._card("Supported formats")
+        formats_card.setObjectName("FormatsCard")
         formats_hint = QLabel("Choose the output that fits your library.")
         formats_hint.setObjectName("Hint")
         formats_layout.addWidget(formats_hint)
@@ -433,7 +463,7 @@ class MusicVaultWindow(QMainWindow):
                                 border-radius:14px; padding:24px; font-size:10pt; }
             QLabel#FormatPill { background:#1B222C; border:1px solid #344050; color:#D3DBE5;
                                 border-radius:9px; padding:8px 5px; font-size:9pt; font-weight:700; }
-            QFrame#Card { background:#141820; border:1px solid #2B333F; border-radius:17px; }
+            QFrame[musicVaultCard="true"] { background:#141820; border:1px solid #2B333F; border-radius:17px; }
             QLineEdit, QComboBox, QListWidget {
                 background:#0E1218; border:1px solid #354050; border-radius:11px;
                 padding:11px 13px; color:#F4F6F8; selection-background-color:#364354;
@@ -455,10 +485,8 @@ class MusicVaultWindow(QMainWindow):
             QTabBar::tab:selected { color:#FFFFFF; background:#32191E; border-color:#82434B; }
             QTabBar::tab:hover:!selected { color:#F0F3F6; background:#222A35; }
             QPushButton { color:#F4F6F8; border:1px solid transparent; border-radius:11px;
-                          padding:11px 16px; font-weight:700; min-height:40px; }
+                          padding:6px 14px; font-weight:700; min-height:22px; }
             QPushButton:focus { border:2px solid #F4F6F8; }
-            QPushButton:hover { padding-top:10px; padding-bottom:12px; }
-            QPushButton:pressed { padding-top:12px; padding-bottom:10px; }
             QPushButton:disabled { background:#242A33; color:#8C96A4; border-color:#303844; }
             QPushButton#YoutubeButton { background:#D93640; color:#FFFFFF; border-color:#E74D56; }
             QPushButton#YoutubeButton:hover { background:#EA454D; }
@@ -468,7 +496,7 @@ class MusicVaultWindow(QMainWindow):
             QPushButton#SecondaryButton { background:#222A35; color:#F0F3F6; border-color:#3B4655; }
             QPushButton#SecondaryButton:hover { background:#2D3744; }
             QPushButton#StopButton { background:#302022; color:#FFC0C0; border-color:#63373C; }
-            QPushButton#TextButton { background:transparent; color:#B8C2CE; padding:7px 9px; }
+            QPushButton#TextButton { background:transparent; color:#B8C2CE; padding:6px 9px; }
             QPushButton#TextButton:hover { color:#FFFFFF; background:#202630; }
             QListWidget#QueueList { border:0; padding:5px; background:#0E1218; }
             QListWidget::item { padding:13px 11px; border-bottom:1px solid #29323E; }
@@ -498,7 +526,7 @@ class MusicVaultWindow(QMainWindow):
         try:
             self.output_dir = str(validate_output_folder(selected))
             self.settings.setValue("output_dir", self.output_dir)
-            self.folder_label.setText(self.output_dir)
+            self.folder_label.set_full_text(self.output_dir)
         except Exception as exc:
             QMessageBox.warning(self, APP_NAME, str(exc))
 
