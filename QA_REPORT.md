@@ -8,8 +8,8 @@ The public [v2.0.2 GitHub Release](https://github.com/Bhaveek08/MusicVault/relea
 | --- | --- | --- | --- |
 | Windows 10/11 x64 | `MusicVault-Setup.exe`, `MusicVault-Windows-x64.zip` | Windows build, packaged `--smoke-test`, and installer compilation passed in [release workflow 44415036837](https://github.com/Bhaveek08/MusicVault/actions/runs/44415036837). | Installer is unsigned. |
 | macOS Apple Silicon | `MusicVault-macos-arm64.dmg` | App-bundle smoke test and DMG creation passed in [macOS workflow 44415984028](https://github.com/Bhaveek08/MusicVault/actions/runs/44415984028). | DMG is unsigned and not notarized; Gatekeeper may warn or block it. Intel Macs are not packaged. |
-| Android | No production release asset | The repository contains a prototype UI, not a complete downloader. | No supported installable release. |
-| iOS/iPadOS | No device-installable release asset | The repository contains a prototype UI, not a complete downloader. | No signed IPA/TestFlight/App Store build. |
+| Android | No production release asset; CI debug APK available as a 30-day artifact | APK installed and Downloads UI rendered on Android 15/API 35 emulator in [mobile build run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433). | Preview UI only; no download engine, signed AAB, or Play Store build. |
+| iOS/iPadOS | No device-installable release asset; CI Simulator app available as a 30-day artifact | Simulator app built, installed, and launched in [mobile build run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433). | Preview UI only; no download engine, device IPA, TestFlight, or App Store build. |
 
 The Windows release job and macOS package job are independent. The macOS DMG was attached after its successful build. Release assets are not code-signed by the current pipelines.
 
@@ -45,3 +45,4 @@ The suite contains 77 pytest cases, including parameterized cases. CI therefore 
 - No client application can be made cheat-engine-proof. Obfuscation can raise reverse-engineering effort but cannot secure logic running on a user's device.
 - Windows and macOS binaries are currently unsigned; macOS also lacks notarization. Public deployment should add trusted signing/notarization and verify downloaded checksums.
 - No test suite proves that software has zero defects.
+- Android and iOS UI shells have native simulator/emulator launch evidence, but they are not complete mobile downloaders and have not been validated on physical devices.

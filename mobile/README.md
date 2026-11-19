@@ -12,8 +12,8 @@ The app's preview queue is only local UI state. Neither native client has a medi
 
 ## Build status
 
-- **Android:** CI builds an unsigned debug APK and uploads it as a 30-day Actions artifact. The most recent emulator launch smoke test failed because ADB lost the emulator during package installation. The workflow now enables KVM before retrying the emulator check. There is no signed AAB or Play Store release.
-- **iOS:** CI builds and launches an unsigned iOS Simulator app, then uploads a Simulator archive and Xcode project source. There is no device IPA, TestFlight build, or App Store release.
+- **Android:** CI builds an unsigned debug APK, installs it on an Android 15/API 35 emulator, verifies that the WebView rendered the Downloads screen, captures a screenshot, and uploads a 30-day Actions artifact. See [successful native build run 44432988433](https://github.com/Bhaveek08/MusicVault/actions/runs/44432988433). There is no signed AAB or Play Store release.
+- **iOS:** CI builds, installs, and launches the unsigned iOS Simulator app, then uploads a Simulator archive and Xcode project source. The same run above passed. There is no device IPA, TestFlight build, or App Store release.
 
 ## Download and install the Android test APK
 
