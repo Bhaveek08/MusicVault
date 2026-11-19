@@ -36,6 +36,7 @@ The suite contains 77 pytest cases, including parameterized cases. CI therefore 
 - Visible desktop button geometry at the configured minimum window size and supported format choices.
 - Output folder validation, output option construction, format mapping, helper formatting, and app identity.
 - Download option constraints that disable cookies, plugins, and remote components.
+- Shared Android/iOS WebView UI: all seven buttons have click handlers; YouTube and Spotify tab switching, paste success/failure, permission and playlist gating, invalid links, queue rendering/cap/clear, and Spotify handoff are exercised by the Node interaction suite.
 
 ## Platform and security boundaries
 

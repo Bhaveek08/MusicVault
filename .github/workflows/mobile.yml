@@ -6,12 +6,14 @@ on:
     paths:
       - "mobile/**"
       - "tests/test_mobile_ui.py"
+      - "tests/mobile_shared_ui.test.cjs"
       - "scripts/capture_ui_previews.py"
       - ".github/workflows/mobile.yml"
   pull_request:
     paths:
       - "mobile/**"
       - "tests/test_mobile_ui.py"
+      - "tests/mobile_shared_ui.test.cjs"
       - "scripts/capture_ui_previews.py"
       - ".github/workflows/mobile.yml"
   workflow_dispatch:
@@ -29,6 +31,9 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -36,6 +41,8 @@ jobs:
         run: python -m pip install -r requirements-test.txt
       - name: Test YouTube/Spotify URL policy and mobile source boundaries
         run: python -m pytest -q tests/test_mobile_ui.py
+      - name: Test shared WebView button interactions and error states
+        run: node tests/mobile_shared_ui.test.cjs
 
   ui-preview:
     name: Render current desktop and mobile UI previews
