@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 import shiboken6
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication, QMessageBox, QPushButton, QTabWidget
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QPushButton, QTabWidget
 
 import musicvault_app
 from musicvault_app import MusicVaultWindow
@@ -154,4 +154,101 @@ def test_all_export_formats_are_available(window):
     assert [window.format_box.itemText(i) for i in range(window.format_box.count())] == [
         "MP3", "WAV", "FLAC", "M4A", "AAC", "OPUS", "MKV"
     ]
+
+
+def test_youtube_paste_button_uses_clipboard(window):
+    QApplication.clipboard().setText("https://youtu.be/BaW_jenozKc")
+    click_button(window, "Paste")
+    assert window.url_input.text() == "https://youtu.be/BaW_jenozKc"
+
+
+def test_spotify_paste_button_uses_clipboard(window):
+    window.findChild(QTabWidget, "SourceTabs").setCurrentIndex(1)
+    QApplication.processEvents()
+    QApplication.clipboard().setText("https://open.spotify.com/track/1234567890123456789012")
+    click_button(window, "Paste")
+    assert window.spotify_input.text() == "https://open.spotify.com/track/1234567890123456789012"
+
+
+def test_change_folder_button_updates_path_and_persists_setting(window, tmp_path, monkeypatch):
+    selected = tmp_path / "chosen music"
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", lambda *_args: str(selected))
+    click_button(window, "Change")
+    assert window.output_dir == str(selected.resolve())
+    assert window.folder_label.text() == str(selected.resolve())
+    assert window.settings.value("output_dir") == str(selected.resolve())
+
+
+def test_change_folder_cancel_keeps_current_path(window, monkeypatch):
+    original = window.output_dir
+    monkeypatch.setattr(QFileDialog, "getExistingDirectory", lambda *_args: "")
+    click_button(window, "Change")
+    assert window.output_dir == original
+
+
+def test_download_and_stop_buttons_drive_queue_worker(window, monkeypatch):
+    window.permission_check.setChecked(True)
+    window.url_input.setText("https://youtu.be/BaW_jenozKc")
+    window.add_to_queue()
+
+    class Signal:
+        def connect(self, _callback):
+            pass
+
+    class FakeWorker:
+        def __init__(self, pending, cancel_event):
+            self.pending = pending
+            self.cancel_event = cancel_event
+            self.progress = Signal()
+            self.done = Signal()
+            self.failed = Signal()
+            self.stopped = Signal()
+            self.finished = Signal()
+            self.started = False
+
+        def start(self):
+            self.started = True
+
+        def isRunning(self):
+            return False
+
+    monkeypatch.setattr(musicvault_app, "Worker", FakeWorker)
+    click_button(window, "Download")
+    assert window.worker.started
+    assert window.worker.pending[0][1] is window.jobs[0]
+    assert window.stop_button.isEnabled()
+
+    click_button(window, "Stop")
+    assert window.cancel_event.is_set()
+    assert not window.stop_button.isEnabled()
+    assert window.status_label.text() == "Stopping…"
+
+
+def test_queue_error_states_are_recoverable(window, warnings):
+    # Invalid source, missing permission, playlist option, and queue cap all
+    # leave the UI usable and avoid creating a phantom queue item.
+    window.url_input.setText("not a URL")
+    window.add_to_queue()
+    assert warnings and window.queue_list.count() == 0
+
+    window.url_input.setText("https://youtu.be/BaW_jenozKc")
+    window.add_to_queue()
+    assert "permission" in warnings[-1].lower()
+    assert window.queue_list.count() == 0
+
+    window.permission_check.setChecked(True)
+    window.url_input.setText("https://www.youtube.com/playlist?list=PL1234567890")
+    window.add_to_queue()
+    assert "Full playlist" in warnings[-1]
+    assert window.queue_list.count() == 0
+
+    window.playlist_check.setChecked(True)
+    for index in range(100):
+        window.url_input.setText(f"https://youtu.be/{index:011d}")
+        window.add_to_queue()
+    assert window.queue_list.count() == 100
+    window.url_input.setText("https://youtu.be/BaW_jenozKc")
+    window.add_to_queue()
+    assert "queue is full" in warnings[-1].lower()
+    assert window.queue_list.count() == 100
 

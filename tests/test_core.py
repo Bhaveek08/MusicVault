@@ -107,4 +107,4 @@ def test_format_helpers_handle_invalid_values():
 
 def test_version_identity():
     assert APP_NAME == "MusicVault"
-    assert APP_VERSION == "2.0.2"
+    assert APP_VERSION == "2.0.3"

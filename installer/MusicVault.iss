@@ -1,5 +1,5 @@
 #define MyAppName "MusicVault"
-#define MyAppVersion "2.0.2"
+#define MyAppVersion "2.0.3"
 #define MyAppPublisher "MusicVault Project"
 #define MyAppExeName "MusicVault.exe"
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.3 — 2026-11-19
+
+- Add the verified Linux x86_64 portable build to versioned GitHub Releases.
+- Add direct latest-release download links for Windows, macOS, and Linux.
+- Clarify that mobile builds are UI prototypes, not media downloader releases.
+- Clarify the source and rights-holder authorization confirmation in the desktop UI.
+- Expand desktop interaction coverage for paste, folder selection, queue errors, download, and stop actions.
+
 ## 2.0.2 — 2026-11-19
 
 - Align the app, Windows installer, package metadata, and release version.

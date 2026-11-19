@@ -3,6 +3,8 @@ name: Linux build
 on:
   push:
     branches: [main]
+    tags:
+      - "v*"
     paths:
       - "musicvault_*.py"
       - "scripts/build_linux.sh"
@@ -44,3 +46,31 @@ jobs:
           path: dist/MusicVault-Linux-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 30
+
+  release:
+    name: Attach Linux package to GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Linux package
+        uses: actions/download-artifact@v4
+        with:
+          name: MusicVault-Linux-x86_64
+          path: release-assets
+      - name: Attach Linux package to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in {1..40}; do
+            if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release upload "$GITHUB_REF_NAME" release-assets/MusicVault-Linux-x86_64.tar.gz --repo "$GITHUB_REPOSITORY" --clobber
+              exit 0
+            fi
+            echo "Waiting for the Windows workflow to create the tagged release (attempt $attempt/40)."
+            sleep 15
+          done
+          echo "The tagged GitHub Release was not created within 10 minutes." >&2
+          exit 1
